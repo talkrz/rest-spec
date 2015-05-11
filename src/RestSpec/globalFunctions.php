@@ -23,6 +23,7 @@ function url($url, $description, callable $useCasesSpecs)
 }
 
 /**
+ * Define an URL use case
  *
  * @param $description
  * @return mixed

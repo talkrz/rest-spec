@@ -4,6 +4,8 @@
 use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsole;
 use RestSpec\Spec;
 
+// @todo: this should be a symfony console application
+
 require __DIR__ . '/../vendor/autoload.php';
 
 $console = new SymfonyConsole();
