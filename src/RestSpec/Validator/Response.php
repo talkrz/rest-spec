@@ -5,7 +5,7 @@ namespace RestSpec\Validator;
 use RestSpec\Spec;
 
 
-class Response
+class Response extends Validator
 {
     use HasConsoleOutput;
 
@@ -20,23 +20,7 @@ class Response
     {
         $output = $this->getOutput()->getOutput();
 
-        $isValid = true;
-
-        if ($responseSpec->getStatusCode()) {
-            $expectedCode = $responseSpec->getStatusCode();
-            $actualCode = $response->getStatusCode();
-
-
-            if ($expectedCode === $actualCode) {
-                $output->writeln(sprintf("\t\tResponse code is <info>%s</info>", $actualCode));
-            } else {
-                $output->writeln(
-                    sprintf("\t\t<error>Response code should be %s actual value is %s</error>",
-                    $expectedCode, $actualCode
-                ));
-                $isValid = false;
-            }
-        }
+        $this->validateStatusCode($response, $responseSpec);
 
         if ($requiredHeaders = $responseSpec->getRequiredHeaders()) {
             foreach($requiredHeaders as $headerName => $headerValue) {
@@ -44,19 +28,18 @@ class Response
 
                 if (!$actualHeader) {
                     $output->writeln(sprintf("\t\t<error>Response does not contain required header %s</error>", $headerName));
-                    $isValid = false;
                 } else if ($actualHeader !== $headerValue) {
-                    $output->writeln(
-                        sprintf("\t\t<error>The actual value of %s header is %s, but should be %s</error>",
+                    $message = sprintf("\t\t<error>The actual value of %s header is %s, but should be %s</error>",
                         $headerName,
                         $actualHeader,
                         $headerValue
-                    ));
-                    $isValid = false;
+                    );
+                    $output->writeln($message);
+                    $this->addViolation($message);
                 }
             }
 
-            if ($isValid) {
+            if ($this->isValid()) {
                 $output->writeln(sprintf("\t\tResponse has following required headers:"));
                 foreach($requiredHeaders as $headerName => $headerValue) {
                     $output->writeln(sprintf("\t\t\t<info>%s: %s</info>", $headerName, $headerValue));
@@ -66,9 +49,31 @@ class Response
 
         if ($responseSpec->getBodyType()) {
             $bodyValidator = new Response\Body($this->getOutput());
-            $isValid = $bodyValidator->validate($response, $responseSpec);
+            $bodyValidator->validate($response, $responseSpec);
+            $this->addViolations($bodyValidator->getViolations());
         }
 
-        return $isValid;
+        return $this->isValid();
+    }
+
+    private function validateStatusCode(\GuzzleHttp\Message\Response $response, Spec\Response $responseSpec)
+    {
+        $output = $this->getOutput()->getOutput();
+
+        if ($responseSpec->getStatusCode()) {
+            $expectedCode = $responseSpec->getStatusCode();
+            $actualCode = $response->getStatusCode();
+
+
+            if ($expectedCode === $actualCode) {
+                $output->writeln(sprintf("\t\tResponse code is <info>%s</info>", $actualCode));
+            } else {
+                $message = sprintf("\t\t<error>Response code should be %s actual value is %s</error>",
+                    $expectedCode, $actualCode
+                );
+                $output->writeln($message);
+                $this->addViolation($message);
+            }
+        }
     }
 }

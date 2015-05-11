@@ -48,15 +48,17 @@ class Rest
 
                     $expectedResponseSpec = $urlUseCaseSpec->getExpectedResponseSpec();
 
-                    $isValid = $responseValidator->validate($res, $expectedResponseSpec);
+                    $responseValidator->validate($res, $expectedResponseSpec);
 
                     $output->write(PHP_EOL);
 
-                    if ($isValid) {
+                    if ($responseValidator->isValid()) {
                         ++$this->useCasesPassedCount;
                     } else {
                         ++$this->useCasesFailedCount;
                     }
+
+                    $responseValidator->reset();
                 }
             }
 

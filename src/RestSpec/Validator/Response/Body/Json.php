@@ -5,9 +5,10 @@ namespace RestSpec\Validator\Response\Body;
 use GuzzleHttp\Message\Response;
 use RestSpec\Spec;
 use RestSpec\Validator\HasConsoleOutput;
+use RestSpec\Validator\Validator;
 use Symfony\Component\Validator\Validation;
 
-class Json
+class Json extends Validator
 {
     use HasConsoleOutput;
 
@@ -18,18 +19,15 @@ class Json
         // first validate whether it is really a JSON
         $actualBodyData = json_decode((string) $response->getBody(), true);
 
-        $isValid = true;
-
         if ($actualBodyData !== null) {
             $output->writeln("\t\tResponse body is valid JSON");
         } else {
-            $output->writeln(
-                sprintf(
-                    "\t\t<error>Response body is not a valid JSON. Actual response body is:</error>\n<info>%s</info>",
-                    \RestSpec\Output\indentValue((string) $response->getBody(), 3)
-                )
+            $message = sprintf(
+                "\t\t<error>Response body is not a valid JSON. Actual response body is:</error>\n<info>%s</info>",
+                \RestSpec\Output\indentValue((string) $response->getBody(), 3)
             );
-            $isValid = false;
+            $output->writeln($message);
+            $this->addViolation($message);
         }
 
         // then if exact body specified check it matches spec
@@ -46,13 +44,12 @@ class Json
                     )
                 );
             } else {
-                $output->writeln(
-                    sprintf("\t\t<error>JSON in body of the response is invalid, actual:</error>\n%s\n\t\t<error>Expected:</error>\n%s",
-                        $this->getOutput()->formatArray($actualBodyData, 3),
-                        $this->getOutput()->formatArray($responseSpec->getBody(), 3)
-                    )
+                $message = sprintf("\t\t<error>JSON in body of the response is invalid, actual:</error>\n%s\n\t\t<error>Expected:</error>\n%s",
+                    $this->getOutput()->formatArray($actualBodyData, 3),
+                    $this->getOutput()->formatArray($responseSpec->getBody(), 3)
                 );
-                $isValid = false;
+                $output->writeln($message);
+                $this->addViolation($message);
             }
         } elseif($constraint = $responseSpec->getBodyConstraint()) {
             $actualBody = (string) $response->getBody();
@@ -70,13 +67,13 @@ class Json
                     $violationsDescription .= $violation . PHP_EOL;
                 }
 
-                $output->writeln(
-                    sprintf(
-                        "\t\t<error>Response body violates constraint:</error>\n<error>%s</error>",
-                        \RestSpec\Output\indentValue($violationsDescription, 3)
-                    )
+                $message = sprintf(
+                    "\t\t<error>Response body violates constraint:</error>\n<error>%s</error>",
+                    \RestSpec\Output\indentValue($violationsDescription, 3)
                 );
-                $isValid = false;
+
+                $output->writeln($message);
+                $this->addViolation($message);
             } else {
                 $output->writeln(
                     sprintf(
@@ -89,6 +86,6 @@ class Json
             }
         }
 
-        return $isValid;
+        return $this->isValid();
     }
 }

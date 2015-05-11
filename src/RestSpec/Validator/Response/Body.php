@@ -6,8 +6,9 @@ use GuzzleHttp\Message\Response;
 use RestSpec\Spec;
 use RestSpec\Validator\HasConsoleOutput;
 use RestSpec\Validator\Response\Body\Json;
+use RestSpec\Validator\Validator;
 
-class Body
+class Body extends Validator
 {
     use HasConsoleOutput;
 
@@ -15,19 +16,19 @@ class Body
     {
         $output = $this->getOutput()->getOutput();
 
-        $isValid = false;
-
         switch($responseSpec->getBodyType()) {
             case Spec\Response::BODY_TYPE_JSON:
                 $jsonValidator = new Json($this->getOutput());
 
-                $isValid = $jsonValidator->validate($response, $responseSpec);
+                $jsonValidator->validate($response, $responseSpec);
+
+                $this->addViolations($jsonValidator->getViolations());
 
                 break;
             default:
                 throw new \RuntimeException(sprintf('The specified response body type %s is not supported', $responseSpec->getBodyType()));
         }
 
-        return $isValid;
+        return $this->isValid();
     }
 }
