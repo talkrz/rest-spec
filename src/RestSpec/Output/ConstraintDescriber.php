@@ -24,6 +24,10 @@ class ConstraintDescriber
     {
         $output = '';
 
+        $className = explode('\\', get_class($constraint));
+        $className = $className[count($className) - 1];
+        $className = 'RestSpec\\Output\\ConstraintDescriber\\' . $className;
+
         if ($constraint instanceof All) {
             $output .= 'Each of results ';
             foreach ($constraint->constraints as $nestedConstraint) {
@@ -47,22 +51,9 @@ class ConstraintDescriber
 
             $output .= indentValue($nestedOutput, 1);
 
-        } elseif ($constraint instanceof NotBlank) {
-            $output .= 'is required';
-
-        } elseif ($constraint instanceof GreaterThan) {
-            $output .= 'should by greater than: ' . $constraint->value;
-        } elseif ($constraint instanceof Length) {
-            $output .= 'should be ';
-            if ($constraint->min) {
-                $output .= 'at least ' . $constraint->min . ' characters long';
-            }
-            if ($constraint->max) {
-                if ($constraint->min) {
-                    $output .= ' and ';
-                }
-                $output .= 'no longer than ' . $constraint->max . ' characters';
-            }
+        } else if (class_exists($className)) {
+            $describer = new $className;
+            $output .= $describer->describe($constraint);
         } else {
             $output .= get_class($constraint);
         }
