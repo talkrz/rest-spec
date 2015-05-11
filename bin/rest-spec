@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsole;
+use RestSpec\Spec;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$console = new SymfonyConsole();
+$constraintDescriber = new \RestSpec\Output\ConstraintDescriber();
+$consoleOutput = new \RestSpec\Output\ConsoleOutput($console, $constraintDescriber);
+$validator = new RestSpec\Validator\Rest($consoleOutput);
+
+$defaultSpecDirectoryName = 'rest-spec';
+$specDirectory = __DIR__ . '/../' . $defaultSpecDirectoryName . '/';
+
+$i = new \DirectoryIterator($specDirectory);
+foreach($i as $file) {
+    if (!$file->isDot()) {
+        $filename = $i->getPathname();
+        require $filename;
+    }
+}
+
+try {
+    $validator->validate(Spec\Rest::getInstance());
+} catch(\Exception $e) {
+    $consoleOutput->getOutput()->writeln('<error>Whoops! Some unexpected error occured. The exception message is following:</error>');
+    $consoleOutput->errorHandler($e, 2);
+}
+
+

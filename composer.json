@@ -1,0 +1,35 @@
+{
+    "name": "talkrz/rest-spec",
+    "description": "A tiny libary for describing RESTful webservices",
+    "keywords": [
+        "restful", "test"
+    ],
+    "homepage": "https://github.com/danielstjules/pho",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Krzysztof Tałajko",
+            "email": "krzysztof.talajko@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "silex/silex": "~1.2",
+        "symfony/console": "~2.3",
+        "symfony/validator": "~2.3",
+        "guzzlehttp/guzzle": "~5.0"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "~2.0"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "files": ["src/RestSpec/functions.php"],
+        "psr-4": {
+            "RestSpec\\": "src/RestSpec/"
+        }
+    },
+    "bin": ["bin/rest-spec"]
+}
