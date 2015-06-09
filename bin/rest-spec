@@ -30,5 +30,3 @@ try {
     $consoleOutput->getOutput()->writeln('<error>Whoops! Some unexpected error occured. The exception message is following:</error>');
     $consoleOutput->errorHandler($e, 2);
 }
-
-
