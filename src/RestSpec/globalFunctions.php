@@ -30,7 +30,7 @@ function url($url, $description, callable $useCasesSpecs)
  */
 function useCase($description, callable $useCaseDefinition)
 {
-    RestSpec\useCase($description, $useCaseDefinition);
+    return RestSpec\useCase($description, $useCaseDefinition);
 }
 
 /**

@@ -46,7 +46,7 @@ class Api
         if (!isset($this->urlSpecs[$url])) {
             $spec = new Url();
             $spec->baseUrl = $this->baseUrl;
-            $spec->url = $url;
+            $spec->setUrl($url);
             $this->urlSpecs[$url] = $spec;
         }
 

@@ -6,6 +6,9 @@ use GuzzleHttp\Message\Request;
 
 class UseCase
 {
+    const PARAMETER_LEFT_DELIMITER = '{';
+    const PARAMETER_RIGHT_DELIMITER = '}';
+
     /**
      * Human readable description of the use case
      *
@@ -40,6 +43,13 @@ class UseCase
      * @var string
      */
     private $url;
+
+    private $exampleUrl;
+
+    /**
+     * @var array
+     */
+    private $exampleParameters;
 
     /**
      * @param $baseUrl
@@ -78,7 +88,43 @@ class UseCase
      */
     public function getRequest()
     {
+        if ($this->isATemplate()) {
+            if (!$this->getExampleParameters()) {
+                throw new \RuntimeException('To use an URL template you have to provide example parameters to call the URL with.');
+            }
+
+            foreach($this->getExampleParameters() as $name => $value) {
+                $this->replaceParameterInUrl($name, $value);
+            }
+        }
         return $this->request;
+    }
+
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    public function getExampleUrl()
+    {
+        return $this->exampleUrl;
+    }
+
+    public function replaceParameterInUrl($name, $value)
+    {
+        $placeholder =
+            self::PARAMETER_LEFT_DELIMITER .
+            $name .
+            self::PARAMETER_RIGHT_DELIMITER;
+
+        if (strpos($this->getUrl(), $placeholder) === false) {
+            throw new \RuntimeException(sprintf('You should have %s placeholder for example parameter in your URL', $placeholder));
+        }
+
+        $this->exampleUrl = $this->url;
+        $this->exampleUrl = str_replace($placeholder, $value, $this->exampleUrl);
+        $this->request->setUrl($this->baseUrl . $this->exampleUrl);
+
     }
 
     /**
@@ -110,5 +156,21 @@ class UseCase
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    public function isATemplate()
+    {
+        return strpos($this->url, self::PARAMETER_LEFT_DELIMITER) !== false &&
+            strpos($this->url, self::PARAMETER_RIGHT_DELIMITER) !== false;
+    }
+
+    public function withExampleParameters(array $parameters)
+    {
+        $this->exampleParameters = $parameters;
+    }
+
+    public function getExampleParameters()
+    {
+        return $this->exampleParameters;
     }
 }

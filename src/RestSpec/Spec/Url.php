@@ -16,7 +16,7 @@ class Url
      *
      * @var string
      */
-    public $url;
+    private $url;
 
     /**
      * Description what this URL is responsible for
@@ -68,6 +68,11 @@ class Url
     public function getUrl()
     {
         return $this->url;
+    }
+
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 
     public function setDescription($description)

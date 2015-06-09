@@ -53,6 +53,8 @@ function useCase($description, callable $useCaseDefinition)
     $useCaseSpec = $urlSpec->useCase($description);
 
     $useCaseDefinition();
+
+    return $useCaseSpec;
 }
 
 /**

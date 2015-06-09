@@ -13,6 +13,12 @@ class Rest
 
     private $useCasesFailedCount = 0;
 
+    /**
+     * @todo A monster method to refactor!!!
+     *
+     * @param  SpecRest $restSpec
+     * @return void
+     */
     public function validate(Spec\Rest $restSpec)
     {
         $apiSpec = $restSpec->getApiSpecs();
@@ -37,16 +43,38 @@ class Rest
 
                 $output->writeln(sprintf("<comment>%s</comment>\n", $urlSpec->getDescription()));
 
-                foreach($urlSpec->getUseCases() as $urlUseCaseSpec) {
+                $useCases = $urlSpec->getUseCases();
+
+                if (!$useCases) {
+                    throw new \RuntimeException('You have to specify use cases inside the URL specificetion');
+                }
+
+                foreach($useCases as $urlUseCaseSpec) {
                     $output->writeln(sprintf("\t<options=bold>%s</options=bold>\n", $urlUseCaseSpec->getDescription()));
 
                     $request = $urlUseCaseSpec->getRequest();
 
-                    $output->writeln(sprintf("\t<info>%s /%s</info>\n", $request->getMethod(), $urlSpec->getUrl()));
+                    if (!$request) {
+                        throw new \RuntimeException('You have to add request specification using givenRequest() function');
+                    }
+
+                    $exampleUrl = '';
+                    if ($urlUseCaseSpec->isATemplate()) {
+
+                        $exampleUrl = sprintf("\t(example URL: <info>%s</info>)", $urlUseCaseSpec->getExampleUrl());
+                    }
+
+                    $output->writeln(sprintf("\t<info>%s %s</info>%s\n", $request->getMethod(), $urlSpec->getUrl(), $exampleUrl));
+
+
 
                     $res = $client->send($request);
 
                     $expectedResponseSpec = $urlUseCaseSpec->getExpectedResponseSpec();
+
+                    if (!$expectedResponseSpec) {
+                        throw new \RuntimeException('You have to specify expected response using expectResponse() function');
+                    }
 
                     $responseValidator->validate($res, $expectedResponseSpec);
 
