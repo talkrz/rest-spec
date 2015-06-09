@@ -40,7 +40,15 @@ class Json extends Validator
 
             $validator = Validation::createValidator();
 
-            $violations = $validator->validateValue($actualBodyData, $constraint);
+            try {
+                $violations = $validator->validateValue($actualBodyData, $constraint);
+            } catch(\Symfony\Component\Validator\Exception\UnexpectedTypeException $e) {
+                throw new \RuntimeException(
+                    sprintf('The type of body response is invalid, actual value: %s', $actualBody),
+                    0,
+                    $e
+                );
+            }
 
             if ($violations->count()) {
 
