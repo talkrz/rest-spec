@@ -1,10 +1,10 @@
 {
     "name": "talkrz/rest-spec",
-    "description": "A tiny libary for describing RESTful webservices",
+    "description": "A small library for describing and testing REST APIs in PHP",
     "keywords": [
-        "restful", "test"
+        "rest", "api", "test"
     ],
-    "homepage": "https://github.com/danielstjules/pho",
+    "homepage": "https://github.com/talkrz/rest-spec",
     "license": "MIT",
     "authors": [
         {
