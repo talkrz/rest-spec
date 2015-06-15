@@ -32,7 +32,7 @@ $consoleOutput = new \RestSpec\Output\ConsoleOutput($console, $constraintDescrib
 $validator = new RestSpec\Validator\Rest($consoleOutput);
 
 $defaultSpecDirectoryName = 'rest-spec';
-$specDirectory = __DIR__ . '/../' . $defaultSpecDirectoryName . '/';
+$specDirectory = dirname(PHPUNIT_COMPOSER_INSTALL) . '/../' . $defaultSpecDirectoryName . '/';
 
 $i = new \DirectoryIterator($specDirectory);
 foreach($i as $file) {
