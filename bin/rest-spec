@@ -45,6 +45,10 @@ foreach($i as $file) {
 try {
     $validator->validate(Spec\Rest::getInstance());
 } catch(\Exception $e) {
-    $consoleOutput->getOutput()->writeln('<error>Whoops! Some unexpected error occured. The exception message is following:</error>');
+    $consoleOutput->getOutput()->writeln(sprintf(
+        '<error>Whoops! Some unexpected error occured. The exception type is: %s, and a message is following:</error>',
+        get_class($e)
+    ));
+
     $consoleOutput->errorHandler($e, 2);
 }
