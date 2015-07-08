@@ -19,13 +19,20 @@ class Json extends Validator
         // first validate whether it is really a JSON
         $actualBodyData = json_decode((string) $response->getBody(), true);
 
+        $output->writeln('');
+
         if ($actualBodyData !== null) {
             $output->writeln("\t\tResponse body is valid JSON");
         } else {
             $message = sprintf(
-                "\t\t<error>Response body is not a valid JSON. Actual response body is:</error>\n<info>%s</info>",
-                \RestSpec\Output\indentValue((string) $response->getBody(), 3)
+                "Response body is not a valid JSON. Actual response body is:\n\n%s",
+                strip_tags((string) $response->getBody())
             );
+
+            $message = \RestSpec\Output\textBox($message, function($line) {
+                return '<error>' . $line . '</error>';
+            }, 3);
+
             $output->writeln($message);
             $this->addViolation($message);
         }
@@ -58,10 +65,14 @@ class Json extends Validator
                 }
 
                 $message = sprintf(
-                    "\t\t<error>Response body violates constraint:</error>\n<error>%s</error>\nActual response body is:</error>\n<info>%s</info>",
-                    \RestSpec\Output\indentValue($violationsDescription, 3),
-                    \RestSpec\Output\indentValue((string) $response->getBody(), 3)
+                    "Response body violates constraint:\n%s\nActual response body is:\n\n%s",
+                    $violationsDescription,
+                    json_encode($actualBodyData, \JSON_PRETTY_PRINT)
                 );
+                $message = \RestSpec\Output\textBox($message, function($line) {
+                    return '<error>' . $line . '</error>';
+                }, 3);
+
 
                 $output->writeln($message);
                 $this->addViolation($message);

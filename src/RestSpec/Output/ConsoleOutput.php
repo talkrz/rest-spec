@@ -18,6 +18,52 @@ function indentValue($value, $indents = 0)
     return $output;
 }
 
+/**
+ * Format simple box of text
+ *
+ * @param  string   $text     a text to display
+ * @param  callable $decorate optional line decorate callback
+ * @param  integer $indents   indent (left margin) of the box
+ * @return string
+ */
+function textBox($text, callable $decorate = null, $indents = 0)
+{
+    $padding = [1, 10, 1, 2];
+    $maxWith = 100;
+    $lines = explode(PHP_EOL, $text);
+
+    for($i = 0; $i < $padding[0]; ++$i) {
+        array_unshift($lines, '');
+    }
+    for($i = 0; $i < $padding[2]; ++$i) {
+        array_push($lines, '');
+    }
+
+    $width = max(array_map(function($v) { return strlen($v); }, $lines));
+    $width = min($width, $maxWith);
+
+    $formatted = '';
+
+    foreach($lines as $line) {
+        if (strlen($line) > $maxWith) {
+            $line = substr($line, 0, $maxWith);
+        }
+
+
+        $line = str_repeat(' ', $padding[3]) .
+            str_pad($line, $width, ' ') .
+            str_repeat(' ', $padding[1]);
+
+        if ($decorate) {
+            $line = $decorate($line);
+        }
+        $line = indentValue($line, $indents);
+        $formatted .= $line . PHP_EOL;
+    }
+
+    return $formatted;
+}
+
 class ConsoleOutput
 {
     /**
