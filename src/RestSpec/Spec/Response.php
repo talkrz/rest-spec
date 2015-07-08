@@ -52,21 +52,21 @@ class Response
         return $this->statusCode;
     }
 
-    public function toHasStatusCode($code)
+    public function hasStatusCode($code)
     {
         $this->statusCode = $code;
 
         return $this;
     }
 
-    public function toHasHeader($name, $value)
+    public function hasHeader($name, $value)
     {
         $this->requiredHeaders[$name] = $value;
 
         return $this;
     }
 
-    public function toHasHeaders(array $headers)
+    public function hasHeaders(array $headers)
     {
         foreach($headers as $headerName => $headerValue) {
             $this->toHasHeader($headerName, $headerValue);
@@ -83,14 +83,14 @@ class Response
         return $this->requiredHeaders;
     }
 
-    public function toHasBodyType($bodyType)
+    public function hasBodyType($bodyType)
     {
         $this->bodyType = $bodyType;
 
         return $this;
     }
 
-    public function toHasBodyEquals($expectedBody)
+    public function hasBodyEquals($expectedBody)
     {
         $this->body = $expectedBody;
 
