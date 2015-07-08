@@ -66,8 +66,6 @@ class Rest
 
                     $output->writeln(sprintf("\t<info>%s %s</info>%s\n", $request->getMethod(), $urlSpec->getUrl(), $exampleUrl));
 
-
-
                     $res = $client->send($request);
 
                     $expectedResponseSpec = $urlUseCaseSpec->getExpectedResponseSpec();

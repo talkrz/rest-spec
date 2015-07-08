@@ -58,8 +58,9 @@ class Json extends Validator
                 }
 
                 $message = sprintf(
-                    "\t\t<error>Response body violates constraint:</error>\n<error>%s</error>",
-                    \RestSpec\Output\indentValue($violationsDescription, 3)
+                    "\t\t<error>Response body violates constraint:</error>\n<error>%s</error>\nActual response body is:</error>\n<info>%s</info>",
+                    \RestSpec\Output\indentValue($violationsDescription, 3),
+                    \RestSpec\Output\indentValue((string) $response->getBody(), 3)
                 );
 
                 $output->writeln($message);

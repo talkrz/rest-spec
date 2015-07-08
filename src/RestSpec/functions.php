@@ -59,16 +59,14 @@ function useCase($description, callable $useCaseDefinition)
 
 /**
  * Define a request
- *
- * @param callable $requestDefinition
  */
-function givenRequest(callable $requestDefinition)
+function givenRequest()
 {
     $restSpec = Spec\Rest::getInstance();
 
     $useCaseSpec = $restSpec->currentApiSpec->getCurrentUrlSpec()->getCurrentUseCaseSpec();
 
-    $useCaseSpec->givenRequest($requestDefinition);
+    return $useCaseSpec->givenRequest();
 }
 
 /**

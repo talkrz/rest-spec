@@ -35,12 +35,10 @@ function useCase($description, callable $useCaseDefinition)
 
 /**
  * Define a request
- *
- * @param callable $requestDefinition
  */
-function givenRequest(callable $requestDefinition)
+function givenRequest()
 {
-    RestSpec\givenRequest($requestDefinition);
+    return RestSpec\givenRequest();
 }
 
 /**

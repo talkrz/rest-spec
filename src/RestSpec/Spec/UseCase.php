@@ -2,7 +2,7 @@
 
 namespace RestSpec\Spec;
 
-use GuzzleHttp\Message\Request;
+use GuzzleHttp\Message\Request as GuzzleRequest;
 
 class UseCase
 {
@@ -21,7 +21,7 @@ class UseCase
      *
      * @var Request
      */
-    private $request;
+    private $requestSpec;
 
     /**
      * Expected response specification
@@ -70,17 +70,15 @@ class UseCase
     }
 
     /**
-     * @param callable $requestDefinition
+     * Create new request specification and return it for further modifications
+     *
      * @return $this
      */
-    public function givenRequest(\Closure $requestDefinition)
+    public function givenRequest()
     {
-        $request = new \GuzzleHttp\Message\Request('GET', $this->baseUrl . $this->url);
+        $this->requestSpec = new Request($this->baseUrl . $this->url);
 
-        $requestDefinition($request);
-
-        $this->request = $request;
-        return $this;
+        return $this->requestSpec;
     }
 
     /**
@@ -88,16 +86,18 @@ class UseCase
      */
     public function getRequest()
     {
+        $request = $this->requestSpec->buildGuzzleRequest();
+
         if ($this->isATemplate()) {
             if (!$this->getExampleParameters()) {
                 throw new \RuntimeException('To use an URL template you have to provide example parameters to call the URL with.');
             }
 
             foreach($this->getExampleParameters() as $name => $value) {
-                $this->replaceParameterInUrl($name, $value);
+                $this->replaceParameterInUrl($name, $value, $request);
             }
         }
-        return $this->request;
+        return $request;
     }
 
     public function getUrl()
@@ -110,7 +110,7 @@ class UseCase
         return $this->exampleUrl;
     }
 
-    public function replaceParameterInUrl($name, $value)
+    public function replaceParameterInUrl($name, $value, GuzzleRequest $request)
     {
         $placeholder =
             self::PARAMETER_LEFT_DELIMITER .
@@ -123,8 +123,7 @@ class UseCase
 
         $this->exampleUrl = $this->url;
         $this->exampleUrl = str_replace($placeholder, $value, $this->exampleUrl);
-        $this->request->setUrl($this->baseUrl . $this->exampleUrl);
-
+        $request->setUrl($this->baseUrl . $this->exampleUrl);
     }
 
     /**
