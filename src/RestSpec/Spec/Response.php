@@ -90,6 +90,16 @@ class Response
         return $this;
     }
 
+    /**
+     * Response contains body in JSON format
+     *
+     * @return Response
+     */
+    public function toBeJson()
+    {
+        return $this->hasBodyType(self::BODY_TYPE_JSON);
+    }
+
     public function hasBodyEquals($expectedBody)
     {
         $this->body = $expectedBody;
