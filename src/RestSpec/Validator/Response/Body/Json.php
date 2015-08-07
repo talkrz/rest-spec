@@ -12,6 +12,8 @@ class Json extends Validator
 {
     use HasConsoleOutput;
 
+    const JSON_OUTPUT_MAX_LENGTH = 20000;
+
     public function validate(Response $response, Spec\Response $responseSpec)
     {
         $output = $this->getOutput()->getOutput();
@@ -64,15 +66,22 @@ class Json extends Validator
                     $violationsDescription .= $violation . PHP_EOL;
                 }
 
+                $encodedJson = json_encode($actualBodyData, \JSON_PRETTY_PRINT);
+
+                if (strlen($encodedJson) > self::JSON_OUTPUT_MAX_LENGTH) {
+                    $encodedJson = substr($encodedJson, 0, self::JSON_OUTPUT_MAX_LENGTH);
+                    $encodedJson .= "\n\n ... this JSON is too large to print all of it";
+                }
+
                 $message = sprintf(
                     "Response body violates constraint:\n%s\nActual response body is:\n\n%s",
                     $violationsDescription,
-                    json_encode($actualBodyData, \JSON_PRETTY_PRINT)
+                    $encodedJson
                 );
+
                 $message = \RestSpec\Output\textBox($message, function($line) {
                     return '<error>' . $line . '</error>';
                 }, 3);
-
 
                 $output->writeln($message);
                 $this->addViolation($message);
