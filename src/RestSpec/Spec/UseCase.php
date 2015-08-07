@@ -140,7 +140,7 @@ class UseCase
             throw new \RuntimeException(sprintf('You should have %s placeholder for example parameter in your URL', $placeholder));
         }
 
-        $this->exampleUrl = $this->url;
+        $this->exampleUrl = $this->exampleUrl ? $this->exampleUrl : $this->url;
         $this->exampleUrl = str_replace($placeholder, $value, $this->exampleUrl);
         $request->setUrl($this->baseUrl . $this->exampleUrl);
     }
