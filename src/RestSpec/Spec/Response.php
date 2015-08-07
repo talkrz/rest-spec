@@ -69,7 +69,7 @@ class Response
     public function hasHeaders(array $headers)
     {
         foreach($headers as $headerName => $headerValue) {
-            $this->toHasHeader($headerName, $headerValue);
+            $this->hasHeader($headerName, $headerValue);
         }
 
         return $this;
