@@ -82,3 +82,18 @@ function expectResponse()
 
     return $useCaseSpec->expectResponse();
 }
+
+/**
+ * Callback executed after testing use case is done
+ *
+ * @param  callable $done
+ * @return void
+ */
+function done(callable $done)
+{
+    $restSpec = Spec\Rest::getInstance();
+
+    $useCaseSpec = $restSpec->currentApiSpec->getCurrentUrlSpec()->getCurrentUseCaseSpec();
+
+    return $useCaseSpec->done($done);    
+}

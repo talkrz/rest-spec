@@ -50,3 +50,14 @@ function expectResponse()
 {
     return RestSpec\expectResponse();
 }
+
+/**
+ * Callback executed after testing use case is done
+ *
+ * @param  callable $done
+ * @return void
+ */
+function done(callable $done)
+{
+    return RestSpec\done($done);
+}

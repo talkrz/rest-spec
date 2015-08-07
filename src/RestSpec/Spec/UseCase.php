@@ -31,6 +31,12 @@ class UseCase
     private $expectedResponseSpec;
 
     /**
+     * Callback executed after testing use case is done
+     * @var callable
+     */
+    private $doneCallback;
+
+    /**
      * The base URL
      *
      * @var string
@@ -98,6 +104,19 @@ class UseCase
             }
         }
         return $request;
+    }
+
+    public function done(callable $done)
+    {
+        $this->doneCallback = $done;
+    }
+
+    /**
+     * @return callable
+     */
+    public function getDoneCallback()
+    {
+        return $this->doneCallback;
     }
 
     public function getUrl()
