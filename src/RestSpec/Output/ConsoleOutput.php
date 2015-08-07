@@ -44,12 +44,21 @@ function textBox($text, callable $decorate = null, $indents = 0)
 
     $formatted = '';
 
+    $linesWrapped = [];
     foreach($lines as $line) {
         if (strlen($line) > $maxWith) {
-            $line = substr($line, 0, $maxWith);
+            $wrappedLine = wordwrap($line, $maxWith, "\n", true);
+            $sublines = explode("\n", $wrappedLine);
+            foreach($sublines as $subline) {
+                $linesWrapped[] = $subline;
+            }
+
+        } else {
+            $linesWrapped[] = $line;
         }
+    }
 
-
+    foreach($linesWrapped as $line) {
         $line = str_repeat(' ', $padding[3]) .
             str_pad($line, $width, ' ') .
             str_repeat(' ', $padding[1]);
