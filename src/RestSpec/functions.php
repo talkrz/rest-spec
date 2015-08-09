@@ -95,5 +95,19 @@ function done(callable $done)
 
     $useCaseSpec = $restSpec->currentApiSpec->getCurrentUrlSpec()->getCurrentUseCaseSpec();
 
-    return $useCaseSpec->done($done);    
+    return $useCaseSpec->done($done);
+}
+
+/**
+ * Return data fixtures container
+ *
+ * @return \Doctrine\Common\Collections\ArrayCollection
+ */
+function dataFixtures()
+{
+    $restSpec = Spec\Rest::getInstance();
+
+    $apiSpec = $restSpec->currentApiSpec;
+
+    return $apiSpec->getDataFixtures();
 }
