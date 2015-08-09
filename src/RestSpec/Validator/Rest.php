@@ -87,7 +87,7 @@ class Rest
                     $responseValidator->reset();
 
                     if ($doneCallback = $urlUseCaseSpec->getDoneCallback()) {
-                        call_user_func($doneCallback);
+                        call_user_func($doneCallback, $res);
                     }
                 }
             }
