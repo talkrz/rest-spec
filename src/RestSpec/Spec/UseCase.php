@@ -100,7 +100,9 @@ class UseCase
             }
 
             foreach($this->getExampleParameters() as $name => $value) {
-                $this->replaceParameterInUrl($name, $value, $request);
+
+                $actualValue = is_callable($value) ? $value() : $value;
+                $this->replaceParameterInUrl($name, $actualValue, $request);
             }
         }
         return $request;
