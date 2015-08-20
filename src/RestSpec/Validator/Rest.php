@@ -66,6 +66,18 @@ class Rest
 
                     $output->writeln(sprintf("\t<info>%s %s</info>%s\n", $request->getMethod(), $urlSpec->getUrl(), $exampleUrl));
 
+                    if ($body = (string) $urlUseCaseSpec->getRequest()->getBody()) {
+                        $json = json_decode($body);
+
+                        if ($json) {
+                            $bodyStr = json_encode($json, JSON_PRETTY_PRINT);
+                        } else {
+                            $bodyStr = $json;
+                        }
+
+                        $output->writeln(sprintf("\tRequest body:\n<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 1)));
+                    }
+
                     $res = $client->send($request);
 
                     $expectedResponseSpec = $urlUseCaseSpec->getExpectedResponseSpec();
