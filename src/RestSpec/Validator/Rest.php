@@ -88,6 +88,10 @@ class Rest
                         $output->writeln(sprintf("\tRequest body:\n<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 1)));
                     }
 
+                    if ($queryParameters = $urlUseCaseSpec->getRequest()->getQuery()) {
+                        $output->writeln(sprintf("\tRequest query: <info>%s</info>\n\n", \RestSpec\Output\indentValue($queryParameters, 1)));
+                    }
+
                     $res = $client->send($request);
 
                     $expectedResponseSpec = $urlUseCaseSpec->getExpectedResponseSpec();
