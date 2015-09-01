@@ -31,6 +31,12 @@ class UseCase
     private $expectedResponseSpec;
 
     /**
+     * Callback executed before testing use case
+     * @var callable
+     */
+    private $beforeCallback;
+
+    /**
      * Callback executed after testing use case is done
      * @var callable
      */
@@ -106,6 +112,19 @@ class UseCase
             }
         }
         return $request;
+    }
+
+    public function before(callable $before)
+    {
+        $this->beforeCallback = $before;
+    }
+
+    /**
+     * @return callable
+     */
+    public function getBeforeCallback()
+    {
+        return $this->beforeCallback;
     }
 
     public function done(callable $done)

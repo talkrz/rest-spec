@@ -58,6 +58,10 @@ class Rest
 
                     $output->writeln(sprintf("\t<options=bold>%s</options=bold>\n", $urlUseCaseSpec->getDescription()));
 
+                    if ($beforeCallback = $urlUseCaseSpec->getBeforeCallback()) {
+                        call_user_func($beforeCallback, $urlUseCaseSpec);
+                    }
+
                     $request = $urlUseCaseSpec->getRequest();
 
                     if (!$request) {

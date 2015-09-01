@@ -52,6 +52,17 @@ function expectResponse()
 }
 
 /**
+ * Callback executed before testing use case
+ *
+ * @param  callable $before
+ * @return void
+ */
+function before(callable $before)
+{
+    return RestSpec\before($before);
+}
+
+/**
  * Callback executed after testing use case is done
  *
  * @param  callable $done
