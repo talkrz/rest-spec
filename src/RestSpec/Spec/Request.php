@@ -11,6 +11,8 @@ class Request
 
     private $method = 'GET';
 
+    private $query = [];
+
     private $headers = [];
 
     private $body = '';
@@ -32,6 +34,12 @@ class Request
     public function method($method)
     {
         $this->method = $method;
+        return $this;
+    }
+
+    public function query(array $query)
+    {
+        $this->query = $query;
         return $this;
     }
 
@@ -70,6 +78,10 @@ class Request
 
         if (!empty($this->headers)) {
             $request->setHeaders($this->headers);
+        }
+
+        if (!empty($this->query)) {
+            $request->setQuery($this->query);
         }
 
         $request->setBody(Stream::factory($this->body));
