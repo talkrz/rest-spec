@@ -45,47 +45,43 @@ class Response
     private $requiredHeaders;
 
     /**
-     * @return mixed
+     * Define expected status code
+     *
+     * @param  int $code HTTP status code
+     * @return Response
      */
-    public function getStatusCode()
-    {
-        return $this->statusCode;
-    }
-
-    public function hasStatusCode($code)
+    public function toHaveStatusCode($code)
     {
         $this->statusCode = $code;
 
         return $this;
     }
 
-    public function hasHeader($name, $value)
+    /**
+     * Define expected single header
+     *
+     * @param  string $name  header's name
+     * @param  string $value header's value
+     * @return Response
+     */
+    public function toHaveHeader($name, $value)
     {
         $this->requiredHeaders[$name] = $value;
 
         return $this;
     }
 
-    public function hasHeaders(array $headers)
+    /**
+     * Define expected multiple headers
+     *
+     * @param  array  $headers array of expected headers
+     * @return Response
+     */
+    public function toHaveHeaders(array $headers)
     {
         foreach($headers as $headerName => $headerValue) {
-            $this->hasHeader($headerName, $headerValue);
+            $this->toHaveHeader($headerName, $headerValue);
         }
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRequiredHeaders()
-    {
-        return $this->requiredHeaders;
-    }
-
-    public function hasBodyType($bodyType)
-    {
-        $this->bodyType = $bodyType;
 
         return $this;
     }
@@ -97,19 +93,49 @@ class Response
      */
     public function toBeJson()
     {
-        return $this->hasBodyType(self::BODY_TYPE_JSON);
+        return $this->toHaveBodyType(self::BODY_TYPE_JSON);
     }
 
-    public function hasBodyEquals($expectedBody)
+    /**
+     * Define expected body type
+     *
+     * @param  int $bodyType see BODY_TYPE_* consts
+     * @return Response
+     */
+    public function toHaveBodyType($bodyType)
     {
-        $this->body = $expectedBody;
+        $this->bodyType = $bodyType;
 
         return $this;
     }
 
-    public function bodyMatchesConstraint(\Closure $constraintDefinition)
+    /**
+     * Set expected constraints body should match
+     *
+     * @param  \Closure $constraintDefinition a closure returning Symfony Validation constraint
+     * @return Response
+     */
+    public function toHaveBodyThatFollows(\Closure $constraintDefinition)
     {
         $this->bodyConstraint = $constraintDefinition();
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRequiredHeaders()
+    {
+        return $this->requiredHeaders;
     }
 
     /**
