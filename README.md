@@ -45,13 +45,14 @@ api('https://api.github.com', function() {
                 ]);
 
             expectResponse()
-                ->hasStatusCode(200)
-                ->toBeJson()
-                ->hasHeaders([
+                ->toHaveStatusCode(200)
+                ->toHaveHeaders([
                     'Content-Type' => 'application/json; charset=utf-8',
                     'Cache-Control' => 'public, max-age=60, s-maxage=60',
                     'Access-Control-Allow-Origin' => '*',
-                ]);
+                ])
+                ->toBeJson()
+                ;
         })->withExampleParameters([
             'userName' => 'octocat',
             'repoName' => 'hello-world',
@@ -86,7 +87,7 @@ api('https://api.github.com', function() {
         useCase('Fetch octocat\'s hello-world repository', function() {
 
         // ...
-                ->hasHeaders([
+                ->toHaveHeaders([
                     'Content-Type' => 'application/json', // wrong header!
                     'Cache-Control' => 'public, max-age=60, s-maxage=60',
                     'Access-Control-Allow-Origin' => '*',
