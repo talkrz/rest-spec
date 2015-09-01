@@ -17,9 +17,10 @@ class Rest
      * @todo A monster method to refactor!!!
      *
      * @param  SpecRest $restSpec
+     * @param  string   $useCaseFilter
      * @return void
      */
-    public function validate(Spec\Rest $restSpec)
+    public function validate(Spec\Rest $restSpec, $useCaseFilter = null)
     {
         $apiSpec = $restSpec->getApiSpecs();
 
@@ -50,6 +51,11 @@ class Rest
                 }
 
                 foreach($useCases as $urlUseCaseSpec) {
+
+                    if ($useCaseFilter && strpos($urlUseCaseSpec->getDescription(), $useCaseFilter) === false) {
+                        continue;
+                    }
+
                     $output->writeln(sprintf("\t<options=bold>%s</options=bold>\n", $urlUseCaseSpec->getDescription()));
 
                     $request = $urlUseCaseSpec->getRequest();

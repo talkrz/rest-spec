@@ -43,7 +43,8 @@ foreach($i as $file) {
 }
 
 try {
-    $validator->validate(Spec\Rest::getInstance());
+    $useCaseFilter = isset($argv[1]) ? $argv[1] : null;
+    $validator->validate(Spec\Rest::getInstance(), $useCaseFilter);
 } catch(\Exception $e) {
     $consoleOutput->getOutput()->writeln(sprintf(
         '<error>Whoops! Some unexpected error occured. The exception type is: %s, and a message is following:</error>',
