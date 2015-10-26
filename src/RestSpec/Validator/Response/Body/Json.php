@@ -53,7 +53,8 @@ class Json extends Validator
                 $violations = $validator->validateValue($actualBodyData, $constraint);
             } catch(\Symfony\Component\Validator\Exception\UnexpectedTypeException $e) {
                 throw new \RuntimeException(
-                    sprintf('The type of body response is invalid, actual value: %s', $actualBody),
+                    sprintf(
+                        "The type of body response is invalid, actual value: %s\n\n(common mistake: you expect a collection in the response but get a single result)\n", $actualBody),
                     0,
                     $e
                 );
