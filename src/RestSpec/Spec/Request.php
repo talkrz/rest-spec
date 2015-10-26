@@ -63,6 +63,9 @@ class Request
      */
     public function body($body)
     {
+        if (!is_string($body)) {
+            throw new \InvalidArgumentException('The request body should be a string.');
+        }
         $this->body = $body;
         return $this;
     }
