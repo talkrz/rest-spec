@@ -1,4 +1,11 @@
 language: php
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 matrix:
   include:
     - 5.4
