@@ -22,11 +22,9 @@ class Rest
      */
     public function validate(Spec\Rest $restSpec, $useCaseFilter = null)
     {
-        $apiSpec = $restSpec->getApiSpecs();
+        $this->parseSpecPass($restSpec);
 
-        if (empty($apiSpec)) {
-            throw new \RuntimeException('No API spec provided');
-        }
+        $apiSpec = $restSpec->getApiSpecs();
 
         foreach($apiSpec as $apiSpec)
         {
@@ -46,10 +44,6 @@ class Rest
 
                 $useCases = $urlSpec->getUseCases();
 
-                if (!$useCases) {
-                    throw new \RuntimeException('You have to specify use cases inside the URL specificetion');
-                }
-
                 foreach($useCases as $urlUseCaseSpec) {
 
                     if ($useCaseFilter && strpos($urlUseCaseSpec->getDescription(), $useCaseFilter) === false) {
@@ -62,23 +56,13 @@ class Rest
 
                     $request = $urlUseCaseSpec->getRequest();
 
-                    if (!$request) {
-                        throw new \RuntimeException('You have to add request specification using givenRequest() function');
-                    }
-
                     $this->printUseCaseInfo($urlUseCaseSpec);
 
                     $res = $client->send($request);
 
                     $expectedResponseSpec = $urlUseCaseSpec->getExpectedResponseSpec();
 
-                    if (!$expectedResponseSpec) {
-                        throw new \RuntimeException('You have to specify expected response using expectResponse() function');
-                    }
-
                     $responseValidator->validate($res, $expectedResponseSpec);
-
-                    $output->write(PHP_EOL);
 
                     if ($responseValidator->isValid()) {
                         ++$this->useCasesPassedCount;
@@ -106,6 +90,56 @@ class Rest
             } else {
                 $output->writeln(')');
                 exit(0);
+            }
+        }
+    }
+
+    /**
+     * First pass of the spec: parse and stop execution on errors
+     * @todo: introduce ParseException
+     *
+     * @param  SpecRest $restSpec
+     * @return void
+     */
+    private function parseSpecPass(Spec\Rest $restSpec)
+    {
+        $apiSpec = $restSpec->getApiSpecs();
+
+        if (empty($apiSpec)) {
+            throw new \RuntimeException('No API spec provided');
+        }
+
+        foreach($apiSpec as $apiSpec) {
+            foreach($apiSpec->getUrlSpecs() as $urlSpec) {
+                $useCases = $urlSpec->getUseCases();
+
+                if (!$useCases) {
+                    throw new \RuntimeException('You have to specify use cases inside the URL specificetion');
+                }
+
+                foreach($useCases as $urlUseCaseSpec) {
+                    if (!$urlUseCaseSpec->getRequest()) {
+                        throw new \RuntimeException('You have to add request specification using givenRequest() function');
+                    }
+
+                    if (!$urlUseCaseSpec->getExpectedResponseSpec()) {
+                        throw new \RuntimeException('You have to specify expected response using expectResponse() function');
+                    }
+
+                    if ($urlUseCaseSpec->isATemplate() && !$urlUseCaseSpec->getExampleParameters()) {
+                        throw new \RuntimeException('To use an URL template you have to provide example parameters to call the URL with.');
+                    }
+
+                    if ($exampleParams = $urlUseCaseSpec->getExampleParameters()) {
+                        foreach($exampleParams as $name => $value) {
+                            $placeholder = $urlUseCaseSpec->buildParameterPlaceholder($name);
+
+                            if (strpos($urlUseCaseSpec->getUrl(), $placeholder) === false) {
+                                throw new \RuntimeException(sprintf('You specified example parameter, but the placeholder "%s" for it is missing in your URL', $placeholder));
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -155,5 +189,7 @@ class Rest
 
             $output->writeln(sprintf("\tRequest body:\n<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 1)));
         }
+
+        $output->write(PHP_EOL);
     }
 }

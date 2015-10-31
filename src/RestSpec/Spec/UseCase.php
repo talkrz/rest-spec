@@ -100,11 +100,7 @@ class UseCase
     {
         $request = $this->requestSpec->buildGuzzleRequest();
 
-        if ($this->isATemplate()) {
-            if (!$this->getExampleParameters()) {
-                throw new \RuntimeException('To use an URL template you have to provide example parameters to call the URL with.');
-            }
-
+        if ($this->isATemplate() && $this->getExampleParameters()) {
             foreach($this->getExampleParameters() as $name => $value) {
                 $actualValue = is_callable($value) ? $value() : $value;
                 $this->replaceParameterInUrl($name, $actualValue, $request);
@@ -149,16 +145,21 @@ class UseCase
         return $this->exampleUrl;
     }
 
-    public function replaceParameterInUrl($name, $value, GuzzleRequest $request)
+    /**
+     * Builds placeholder for example parameter for URL like {id}
+     * @param  string $name
+     * @return string
+     */
+    public function buildParameterPlaceholder($name)
     {
-        $placeholder =
-            self::PARAMETER_LEFT_DELIMITER .
+        return self::PARAMETER_LEFT_DELIMITER .
             $name .
             self::PARAMETER_RIGHT_DELIMITER;
+    }
 
-        if (strpos($this->getUrl(), $placeholder) === false) {
-            throw new \RuntimeException(sprintf('You should have %s placeholder for example parameter in your URL', $placeholder));
-        }
+    private function replaceParameterInUrl($name, $value, GuzzleRequest $request)
+    {
+        $placeholder = $this->buildParameterPlaceholder($name);
 
         $this->exampleUrl = $this->exampleUrl ? $this->exampleUrl : $this->url;
         $this->exampleUrl = str_replace($placeholder, $value, $this->exampleUrl);
