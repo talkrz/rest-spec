@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/talkrz/rest-spec.svg?branch=master)](https://travis-ci.org/talkrz/rest-spec)
 # rest-spec
 
 A simple library for creating self-verifying API specifications, and end-to-end testing written in PHP.
