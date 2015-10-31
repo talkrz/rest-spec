@@ -43,6 +43,11 @@ class Request
         return $this;
     }
 
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
     /**
      * Set headers
      *

@@ -106,7 +106,6 @@ class UseCase
             }
 
             foreach($this->getExampleParameters() as $name => $value) {
-
                 $actualValue = is_callable($value) ? $value() : $value;
                 $this->replaceParameterInUrl($name, $actualValue, $request);
             }
@@ -164,6 +163,9 @@ class UseCase
         $this->exampleUrl = $this->exampleUrl ? $this->exampleUrl : $this->url;
         $this->exampleUrl = str_replace($placeholder, $value, $this->exampleUrl);
         $request->setUrl($this->baseUrl . $this->exampleUrl);
+        if ($query = $this->requestSpec->getQuery()) {
+            $request->setQuery($query);
+        }
     }
 
     /**
