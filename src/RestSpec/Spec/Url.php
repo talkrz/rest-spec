@@ -70,6 +70,11 @@ class Url
         return $this->url;
     }
 
+    /**
+     * Set the URL
+     *
+     * @param string $url
+     */
     public function setUrl($url)
     {
         $this->url = $url;
