@@ -6,4 +6,6 @@ php:
   - hhvm
   - nightly
 
+install: composer update
+
 script: bin/phpspec run --format=pretty
