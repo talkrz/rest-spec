@@ -14,6 +14,13 @@ class Json extends Validator
 
     const JSON_OUTPUT_MAX_LENGTH = 20000;
 
+    /**
+     * Yet another monstrous method to refactor ;)
+     *
+     * @param  Response     $response
+     * @param  SpecResponse $responseSpec
+     * @return boolean
+     */
     public function validate(Response $response, Spec\Response $responseSpec)
     {
         $output = $this->getOutput()->getOutput();

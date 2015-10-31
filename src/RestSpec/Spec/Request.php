@@ -43,6 +43,31 @@ class Request
         return $this;
     }
 
+    /**
+     * Get request method
+     *
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * Get URL
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * Get query parameters
+     *
+     * @return array
+     */
     public function getQuery()
     {
         return $this->query;
@@ -61,6 +86,16 @@ class Request
     }
 
     /**
+     * Get list of headers
+     *
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
      * Set request body
      *
      * @param  string
@@ -73,6 +108,15 @@ class Request
         }
         $this->body = $body;
         return $this;
+    }
+
+    /**
+     * Get body
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
     }
 
     /**
