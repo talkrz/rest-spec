@@ -56,8 +56,6 @@ class Rest
                         continue;
                     }
 
-                    $output->writeln(sprintf("\t<options=bold>%s</options=bold>\n", $urlUseCaseSpec->getDescription()));
-
                     if ($beforeCallback = $urlUseCaseSpec->getBeforeCallback()) {
                         call_user_func($beforeCallback, $urlUseCaseSpec);
                     }
@@ -68,29 +66,7 @@ class Rest
                         throw new \RuntimeException('You have to add request specification using givenRequest() function');
                     }
 
-                    $exampleUrl = '';
-                    if ($urlUseCaseSpec->isATemplate()) {
-
-                        $exampleUrl = sprintf("\t(example URL: <info>%s</info>)", $urlUseCaseSpec->getExampleUrl());
-                    }
-
-                    $output->writeln(sprintf("\t<info>%s %s</info>%s\n", $request->getMethod(), $urlSpec->getUrl(), $exampleUrl));
-
-                    if ($body = (string) $urlUseCaseSpec->getRequest()->getBody()) {
-                        $json = json_decode($body);
-
-                        if ($json) {
-                            $bodyStr = json_encode($json, JSON_PRETTY_PRINT);
-                        } else {
-                            $bodyStr = $json;
-                        }
-
-                        $output->writeln(sprintf("\tRequest body:\n<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 1)));
-                    }
-
-                    if ($queryParameters = $urlUseCaseSpec->getRequest()->getQuery()) {
-                        $output->writeln(sprintf("\tRequest query: <info>%s</info>\n\n", \RestSpec\Output\indentValue($queryParameters, 1)));
-                    }
+                    $this->printUseCaseInfo($urlUseCaseSpec);
 
                     $res = $client->send($request);
 
@@ -131,6 +107,53 @@ class Rest
                 $output->writeln(')');
                 exit(0);
             }
+        }
+    }
+
+    /**
+     * Display human readable info about URL use case
+     *
+     * @param  Spec\UseCase $useCase an URL use case specification
+     * @return void
+     */
+    private function printUseCaseInfo(Spec\UseCase $useCase)
+    {
+        $output = $this->getOutput()->getOutput();
+        $request = $useCase->getRequest();
+
+        $output->writeln(sprintf("\t<options=bold>%s</options=bold>\n", $useCase->getDescription()));
+
+        $exampleUrl = '';
+        if ($useCase->isATemplate()) {
+            $exampleUrl = sprintf("\t(example URL: <info>%s</info>)", $useCase->getExampleUrl());
+        }
+
+        $output->writeln(sprintf("\t<info>%s %s</info>%s\n", $request->getMethod(), $useCase->getUrl(), $exampleUrl));
+
+        if ($queryParameters = (string) $request->getQuery()) {
+            $output->writeln(sprintf("\tRequest query: <info>%s</info>\n\n", \RestSpec\Output\indentValue($queryParameters, 1)));
+        }
+
+        if ($headers = $request->getHeaders()) {
+            $output->writeln("\tRequest headers:");
+
+            foreach($headers as $headerName => $headerValue) {
+                $output->writeln(sprintf("\t\t<info>%s: %s</info>", $headerName, join('; ', $headerValue)));
+            }
+
+            $output->writeln('');
+        }
+
+        if ($body = (string) $request->getBody()) {
+            $json = json_decode($body);
+
+            if ($json) {
+                $bodyStr = json_encode($json, JSON_PRETTY_PRINT);
+            } else {
+                $bodyStr = $json;
+            }
+
+            $output->writeln(sprintf("\tRequest body:\n<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 1)));
         }
     }
 }
