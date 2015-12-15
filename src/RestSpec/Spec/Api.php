@@ -2,8 +2,6 @@
 
 namespace RestSpec\Spec;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 class Api
 {
     /**
@@ -26,15 +24,9 @@ class Api
      */
     private $currentUrlSpec;
 
-    /**
-     * @var ArrayCollection
-     */
-    private $dataFixtures;
-
     public function __construct($baseUrl)
     {
         $this->baseUrl = $baseUrl;
-        $this->dataFixtures = new ArrayCollection();
     }
 
     /**
@@ -77,14 +69,6 @@ class Api
     public function setBaseUrl($baseUrl)
     {
         $this->baseUrl = $baseUrl;
-    }
-
-    /**
-     * @return ArrayCollection
-     */
-    public function getDataFixtures()
-    {
-        return $this->dataFixtures;
     }
 
     /**

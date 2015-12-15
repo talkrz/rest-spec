@@ -72,13 +72,3 @@ function done(callable $done)
 {
     return RestSpec\done($done);
 }
-
-/**
- * Return data fixtures container
- *
- * @return \Doctrine\Common\Collections\ArrayCollection
- */
-function dataFixtures()
-{
-    return RestSpec\dataFixtures();
-}
