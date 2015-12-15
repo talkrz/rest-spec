@@ -29,16 +29,8 @@ class RunCommand extends Command
 
         $consoleOutput = new \RestSpec\Output\ConsoleOutput($output, $constraintDescriber);
         $validator = new \RestSpec\Validator\Rest($consoleOutput);
-
-        $defaultSpecDirectoryName = 'rest-spec';
-        $specDirectory = dirname(COMPOSER_INSTALL) . '/../' . $defaultSpecDirectoryName . '/';
-        $i = new \DirectoryIterator($specDirectory);
-        foreach($i as $file) {
-            if (!$file->isDot()) {
-                $filename = $i->getPathname();
-                require $filename;
-            }
-        }
+        $loader = new \RestSpec\Loader();
+        $loader->run();
 
         try {
             $useCaseFilter = $input->getArgument('filter');
