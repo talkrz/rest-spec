@@ -34,7 +34,10 @@ class RunCommand extends Command
 
         try {
             $useCaseFilter = $input->getArgument('filter');
-            $validator->validate(Spec\Rest::getInstance(), $useCaseFilter);
+            $restSpec = Spec\Rest::getInstance();
+            $restSpecValidator = new \RestSpec\Spec\Validator();
+            $restSpecValidator->validate($restSpec);
+            $validator->validate($restSpec, $useCaseFilter);
         } catch(\Exception $e) {
             $consoleOutput->getOutput()->writeln(sprintf(
                 '<error>Whoops! Some unexpected error occured. The exception type is: %s, and a message is following:</error>',
