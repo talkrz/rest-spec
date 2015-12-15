@@ -34,7 +34,7 @@ class Rest
 
             $output = $this->getOutput()->getOutput();
 
-            $output->writeln(sprintf("Specification of API at: <info>%s</info>\n", $apiSpec->getBaseUrl()));
+            $output->writeln(sprintf("API base URL: <info>%s</info>\n", $apiSpec->getBaseUrl()));
 
             $responseValidator = new Response($this->getOutput());
 
