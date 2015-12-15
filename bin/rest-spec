@@ -1,10 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-use Symfony\Component\Console\Output\ConsoleOutput as SymfonyConsole;
-use RestSpec\Spec;
-
-// @todo: this should be a symfony console application
+use Symfony\Component\Console\Application,
+    RestSpec\Console\Command\HelpCommand,
+    RestSpec\Console\Command\RunCommand;
 
 foreach (array(__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php') as $file) {
     if (file_exists($file)) {
@@ -26,30 +25,9 @@ if (!defined('COMPOSER_INSTALL')) {
 
 require COMPOSER_INSTALL;
 
-$console = new SymfonyConsole();
-$constraintDescriber = new \RestSpec\Output\ConstraintDescriber();
-$consoleOutput = new \RestSpec\Output\ConsoleOutput($console, $constraintDescriber);
-$validator = new RestSpec\Validator\Rest($consoleOutput);
-
-$defaultSpecDirectoryName = 'rest-spec';
-$specDirectory = dirname(COMPOSER_INSTALL) . '/../' . $defaultSpecDirectoryName . '/';
-
-$i = new \DirectoryIterator($specDirectory);
-foreach($i as $file) {
-    if (!$file->isDot()) {
-        $filename = $i->getPathname();
-        require $filename;
-    }
-}
-
-try {
-    $useCaseFilter = isset($argv[1]) ? $argv[1] : null;
-    $validator->validate(Spec\Rest::getInstance(), $useCaseFilter);
-} catch(\Exception $e) {
-    $consoleOutput->getOutput()->writeln(sprintf(
-        '<error>Whoops! Some unexpected error occured. The exception type is: %s, and a message is following:</error>',
-        get_class($e)
-    ));
-
-    $consoleOutput->errorHandler($e, 2);
-}
+$helpCommand = new HelpCommand();
+$application = new Application();
+$application->add($helpCommand);
+$application->add(new RunCommand());
+$application->setDefaultCommand($helpCommand->getName());
+$application->run();
