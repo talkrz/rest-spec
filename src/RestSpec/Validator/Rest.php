@@ -4,6 +4,7 @@ namespace RestSpec\Validator;
 
 use RestSpec\Output\Formatter;
 use RestSpec\Spec;
+use RestSpec\Console\SpecView\UseCaseView;
 
 class Rest
 {
@@ -32,19 +33,19 @@ class Rest
 
             $output = $this->getOutput()->getOutput();
 
-            $output->writeln(sprintf("API base URL: <info>%s</info>\n", $apiSpec->getBaseUrl()));
+            $output->writeln(sprintf("\nAPI base URL: <info>%s</info>\n", $apiSpec->getBaseUrl()));
 
             $responseValidator = new Response($this->getOutput());
 
             foreach($apiSpec->getUrlSpecs() as $urlSpec) {
 
-                $output->writeln(sprintf("<comment>%s</comment>\n", $urlSpec->getDescription()));
+                $output->writeln(sprintf("<comment>%s</comment>\n\n<info>%s</info>\n", $urlSpec->getDescription(), $urlSpec->getUrl()));
 
                 $useCases = $urlSpec->getUseCases();
 
                 foreach($useCases as $urlUseCaseSpec) {
 
-                    if ($useCaseFilter && strpos($urlUseCaseSpec->getDescription(), $useCaseFilter) === false) {
+                    if ($useCaseFilter && strpos(strtolower($urlUseCaseSpec->getDescription()), strtolower($useCaseFilter)) === false) {
                         continue;
                     }
 
@@ -54,7 +55,8 @@ class Rest
 
                     $request = $urlUseCaseSpec->getRequest();
 
-                    $this->printUseCaseInfo($urlUseCaseSpec);
+                    $useCaseView = new UseCaseView();
+                    $useCaseView->view($urlUseCaseSpec, $output);
 
                     $res = $client->send($request);
 
@@ -90,54 +92,5 @@ class Rest
                 exit(0);
             }
         }
-    }
-
-    /**
-     * Display human readable info about URL use case
-     *
-     * @param  Spec\UseCase $useCase an URL use case specification
-     * @return void
-     */
-    private function printUseCaseInfo(Spec\UseCase $useCase)
-    {
-        $output = $this->getOutput()->getOutput();
-        $request = $useCase->getRequest();
-
-        $output->writeln(sprintf("\t<options=bold>%s</options=bold>\n", $useCase->getDescription()));
-
-        $exampleUrl = '';
-        if ($useCase->isATemplate()) {
-            $exampleUrl = sprintf("\t(example URL: <info>%s</info>)", $useCase->getExampleUrl());
-        }
-
-        $output->writeln(sprintf("\t<info>%s %s</info>%s\n", $request->getMethod(), $useCase->getUrl(), $exampleUrl));
-
-        if ($queryParameters = (string) $request->getQuery()) {
-            $output->writeln(sprintf("\tRequest query: <info>%s</info>\n\n", \RestSpec\Output\indentValue($queryParameters, 1)));
-        }
-
-        if ($headers = $request->getHeaders()) {
-            $output->writeln("\tRequest headers:");
-
-            foreach($headers as $headerName => $headerValue) {
-                $output->writeln(sprintf("\t\t<info>%s: %s</info>", $headerName, join('; ', $headerValue)));
-            }
-
-            $output->writeln('');
-        }
-
-        if ($body = (string) $request->getBody()) {
-            $json = json_decode($body);
-
-            if ($json) {
-                $bodyStr = json_encode($json, JSON_PRETTY_PRINT);
-            } else {
-                $bodyStr = $json;
-            }
-
-            $output->writeln(sprintf("\tRequest body:\n<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 1)));
-        }
-
-        $output->write(PHP_EOL);
     }
 }

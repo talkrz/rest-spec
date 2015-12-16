@@ -3,6 +3,7 @@
 
 use Symfony\Component\Console\Application,
     RestSpec\Console\Command\HelpCommand,
+    RestSpec\Console\Command\GlimpseCommand,
     RestSpec\Console\Command\RunCommand;
 
 foreach (array(__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoload.php') as $file) {
@@ -28,6 +29,7 @@ require COMPOSER_INSTALL;
 $helpCommand = new HelpCommand();
 $application = new Application();
 $application->add($helpCommand);
+$application->add(new GlimpseCommand());
 $application->add(new RunCommand());
 $application->setDefaultCommand($helpCommand->getName());
 $application->run();
