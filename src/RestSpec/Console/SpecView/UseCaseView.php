@@ -28,7 +28,7 @@ class UseCaseView
         }
 
         if ($queryParameters = (string) $request->getQuery()) {
-            $url .= '?' . $queryParameters;
+            $url .= '?' . urldecode($queryParameters);
         }
 
         $output->writeln(sprintf("\t<info>%s %s</info>\n", $request->getMethod(), $url));
