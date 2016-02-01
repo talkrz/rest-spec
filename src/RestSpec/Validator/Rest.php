@@ -23,10 +23,9 @@ class Rest
      */
     public function validate(Spec\Rest $restSpec, $useCaseFilter = null)
     {
-        $apiSpec = $restSpec->getApiSpecs();
+        $apiSpecs = $restSpec->getApiSpecs();
 
-        foreach($apiSpec as $apiSpec)
-        {
+        foreach ($apiSpecs as $apiSpec) {
             $client = new \GuzzleHttp\Client([
                 'base_url' => $apiSpec->getBaseUrl(),
             ]);
@@ -37,14 +36,12 @@ class Rest
 
             $responseValidator = new Response($this->getOutput());
 
-            foreach($apiSpec->getUrlSpecs() as $urlSpec) {
-
+            foreach ($apiSpec->getUrlSpecs() as $urlSpec) {
                 $output->writeln(sprintf("<comment>%s</comment>\n\n<info>%s</info>\n", $urlSpec->getDescription(), $urlSpec->getUrl()));
 
                 $useCases = $urlSpec->getUseCases();
 
-                foreach($useCases as $urlUseCaseSpec) {
-
+                foreach ($useCases as $urlUseCaseSpec) {
                     if ($useCaseFilter && strpos(strtolower($urlUseCaseSpec->getDescription()), strtolower($useCaseFilter)) === false) {
                         continue;
                     }
@@ -77,20 +74,20 @@ class Rest
                     }
                 }
             }
+        }
 
-            $output->write(sprintf(
-                'Tested %d use cases. (<info>Passed: %d</info>',
-                $this->useCasesPassedCount + $this->useCasesFailedCount,
-                $this->useCasesPassedCount
-            ));
+        $output->write(sprintf(
+            'Tested %d use cases. (<info>Passed: %d</info>',
+            $this->useCasesPassedCount + $this->useCasesFailedCount,
+            $this->useCasesPassedCount
+        ));
 
-            if ($this->useCasesFailedCount > 0) {
-                $output->writeln(sprintf(', <error>Failed: %d</error>)', $this->useCasesFailedCount));
-                exit(1);
-            } else {
-                $output->writeln(')');
-                exit(0);
-            }
+        if ($this->useCasesFailedCount > 0) {
+            $output->writeln(sprintf(', <error>Failed: %d</error>)', $this->useCasesFailedCount));
+            exit(1);
+        } else {
+            $output->writeln(')');
+            exit(0);
         }
     }
 }

@@ -12,11 +12,17 @@ class Loader
         $defaultSpecDirectoryName = 'rest-spec';
 
         $specDirectory = dirname(COMPOSER_INSTALL) . '/../' . $defaultSpecDirectoryName . '/';
-        $i = new \DirectoryIterator($specDirectory);
-        foreach($i as $file) {
-            if (!$file->isDot()) {
-                $filename = $i->getPathname();
-                require $filename;
+        $i = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $specDirectory,
+                \RecursiveDirectoryIterator::SKIP_DOTS
+            )
+        );
+
+        foreach ($i as $file) {
+            if (!$file->isDir() && strpos($file->getFilename(), '.php') !== false) {
+                $filename = $file->getPathname();
+                require_once $filename;
             }
         }
     }
