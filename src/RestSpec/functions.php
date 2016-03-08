@@ -10,12 +10,13 @@ require_once __DIR__ . '/globalFunctions.php';
  * Define an API specification as a set of URLs specifications
  *
  * @param $baseUrl
+ * @param $name
  * @param callable $urlSpecs
  */
-function api($baseUrl, callable $urlSpecs)
+function api($baseUrl, $name, callable $urlSpecs)
 {
     $restSpec = Spec\Rest::getInstance();
-    $restSpec->apiSpec($baseUrl);
+    $restSpec->apiSpec($baseUrl, $name);
 
     $urlSpecs();
 }

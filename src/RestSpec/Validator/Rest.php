@@ -21,16 +21,19 @@ class Rest
      * @param  string   $useCaseFilter
      * @return void
      */
-    public function validate(Spec\Rest $restSpec, $useCaseFilter = null)
+    public function validate(Spec\Rest $restSpec, $apiFilter, $useCaseFilter = null)
     {
         $apiSpecs = $restSpec->getApiSpecs();
 
+        $output = $this->getOutput()->getOutput();
+
         foreach ($apiSpecs as $apiSpec) {
+            if ($apiFilter && $apiSpec->getName() !== $apiFilter) {
+                continue;
+            }
             $client = new \GuzzleHttp\Client([
                 'base_url' => $apiSpec->getBaseUrl(),
             ]);
-
-            $output = $this->getOutput()->getOutput();
 
             $output->writeln(sprintf("\nAPI base URL: <info>%s</info>\n", $apiSpec->getBaseUrl()));
 
@@ -76,18 +79,26 @@ class Rest
             }
         }
 
-        $output->write(sprintf(
-            'Tested %d use cases. (<info>Passed: %d</info>',
-            $this->useCasesPassedCount + $this->useCasesFailedCount,
-            $this->useCasesPassedCount
-        ));
+        $totalUseCases = $this->useCasesPassedCount + $this->useCasesFailedCount;
 
-        if ($this->useCasesFailedCount > 0) {
-            $output->writeln(sprintf(', <error>Failed: %d</error>)', $this->useCasesFailedCount));
-            exit(1);
+        if ($totalUseCases) {
+            $output->write(sprintf(
+                'Tested %d use cases. (<info>Passed: %d</info>',
+                $totalUseCases,
+                $this->useCasesPassedCount
+            ));
+            if ($this->useCasesFailedCount > 0) {
+                $output->writeln(sprintf(', <error>Failed: %d</error>)', $this->useCasesFailedCount));
+                exit(1);
+            } else {
+                $output->writeln(')');
+                exit(0);
+            }
         } else {
-            $output->writeln(')');
-            exit(0);
+            $output->writeln('No use cases matching your criteria:');
+            $output->writeln(sprintf('  - api filter: %s', $apiFilter ? $apiFilter : '[none]'));
+            $output->writeln(sprintf('  - use case filter: %s', $useCaseFilter ? $useCaseFilter : '[none]'));
+            exit(1);
         }
     }
 }

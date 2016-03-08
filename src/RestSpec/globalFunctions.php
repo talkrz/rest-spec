@@ -4,11 +4,12 @@
  * Define an API specification as a set of URLs specifications
  *
  * @param $baseUrl
+ * @param $name
  * @param callable $urlSpecs
  */
-function api($baseUrl, callable $urlSpecs)
+function api($baseUrl, $name, callable $urlSpecs)
 {
-    RestSpec\api($baseUrl, $urlSpecs);
+    RestSpec\api($baseUrl, $name, $urlSpecs);
 }
 
 /**

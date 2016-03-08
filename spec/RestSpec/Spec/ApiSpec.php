@@ -9,15 +9,16 @@ class ApiSpec extends ObjectBehavior
 {
     private $baseUrl = 'http://example.com';
 
-    function it_is_initializable()
+    public function it_is_initializable()
     {
-        $this->beConstructedWith($this->baseUrl);
+        $this->beConstructedWith($this->baseUrl, 'Some name');
         $this->shouldHaveType('RestSpec\Spec\Api');
     }
 
-    function it_is_initialized_with_base_url()
+    public function it_is_initialized_with_base_url()
     {
-        $this->beConstructedWith($this->baseUrl);
+        $this->beConstructedWith($this->baseUrl, 'Some name');
         $this->getBaseUrl()->shouldReturn($this->baseUrl);
+        $this->getName()->shouldReturn('Some name');
     }
 }

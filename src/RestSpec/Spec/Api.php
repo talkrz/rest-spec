@@ -12,6 +12,13 @@ class Api
     private $baseUrl;
 
     /**
+     * The name of the API
+     *
+     * @var string
+     */
+    private $name;
+
+    /**
      * Specifications for every available URL
      *
      * @var array
@@ -24,9 +31,10 @@ class Api
      */
     private $currentUrlSpec;
 
-    public function __construct($baseUrl)
+    public function __construct($baseUrl, $name)
     {
         $this->baseUrl = $baseUrl;
+        $this->name = $name;
     }
 
     /**
@@ -77,5 +85,14 @@ class Api
     public function getCurrentUrlSpec()
     {
         return $this->currentUrlSpec;
+    }
+
+    /**
+     * Get API name
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 }

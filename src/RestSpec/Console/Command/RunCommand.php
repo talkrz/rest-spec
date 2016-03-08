@@ -2,11 +2,12 @@
 
 namespace RestSpec\Console\Command;
 
-use Symfony\Component\Console\Command\Command,
-    Symfony\Component\Console\Input\InputArgument,
-    Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Output\OutputInterface,
-    RestSpec\Spec;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use RestSpec\Spec;
 
 class RunCommand extends Command
 {
@@ -15,6 +16,11 @@ class RunCommand extends Command
         $this
             ->setName('run')
             ->setDescription('Run validation of the spec against the API')
+            ->addOption(
+                'api',
+                null,
+                InputOption::VALUE_REQUIRED
+            )
             ->addArgument(
                 'filter',
                 InputArgument::OPTIONAL,
@@ -34,11 +40,12 @@ class RunCommand extends Command
 
         try {
             $useCaseFilter = $input->getArgument('filter');
+            $api = $input->getOption('api');
             $restSpec = Spec\Rest::getInstance();
             $restSpecValidator = new \RestSpec\Spec\Validator();
             $restSpecValidator->validate($restSpec);
-            $validator->validate($restSpec, $useCaseFilter);
-        } catch(\Exception $e) {
+            $validator->validate($restSpec, $api, $useCaseFilter);
+        } catch (\Exception $e) {
             $consoleOutput->getOutput()->writeln(sprintf(
                 '<error>Whoops! Some unexpected error occured. The exception type is: %s, and a message is following:</error>',
                 get_class($e)

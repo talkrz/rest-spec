@@ -30,12 +30,13 @@ class Rest
      * Start with new API specification
      *
      * @param $baseUrl
+     * @param $name
      * @return Api
      */
-    public function apiSpec($baseUrl)
+    public function apiSpec($baseUrl, $name)
     {
         if (!isset($this->apiSpecs[$baseUrl])) {
-            $spec = new Api($baseUrl);
+            $spec = new Api($baseUrl, $name);
             $this->apiSpecs[$baseUrl] = $spec;
         }
 
@@ -59,7 +60,11 @@ class Rest
         return $instance;
     }
 
-    protected function __construct() {}
+    protected function __construct()
+    {
+    }
 
-    private function __clone() {}
+    private function __clone()
+    {
+    }
 }

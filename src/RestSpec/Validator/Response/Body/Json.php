@@ -38,7 +38,7 @@ class Json extends Validator
                 strip_tags((string) $response->getBody())
             );
 
-            $message = \RestSpec\Output\textBox($message, function($line) {
+            $message = \RestSpec\Output\textBox($message, function ($line) {
                 return '<error>' . $line . '</error>';
             }, 3);
 
@@ -49,7 +49,7 @@ class Json extends Validator
         // then if exact body specified check it matches spec
         if ($responseSpec->getBody()) {
             $this->validateBody($response, $responseSpec);
-        } elseif($constraint = $responseSpec->getBodyConstraint()) {
+        } elseif ($constraint = $responseSpec->getBodyConstraint()) {
             $actualBody = (string) $response->getBody();
 
             $actualBodyData = json_decode($actualBody, true);
@@ -58,7 +58,7 @@ class Json extends Validator
 
             try {
                 $violations = $validator->validateValue($actualBodyData, $constraint);
-            } catch(\Symfony\Component\Validator\Exception\UnexpectedTypeException $e) {
+            } catch (\Symfony\Component\Validator\Exception\UnexpectedTypeException $e) {
                 throw new \RuntimeException(
                     sprintf(
                         "The type of body response is invalid, actual value: %s\n\n(common mistake: you expect a collection in the response but get a single result)\n", $actualBody),
@@ -68,9 +68,8 @@ class Json extends Validator
             }
 
             if ($violations->count()) {
-
                 $violationsDescription = '';
-                foreach($violations as $violation) {
+                foreach ($violations as $violation) {
                     $violationsDescription .= $violation . PHP_EOL;
                 }
 
@@ -87,7 +86,7 @@ class Json extends Validator
                     $encodedJson
                 );
 
-                $message = \RestSpec\Output\textBox($message, function($line) {
+                $message = \RestSpec\Output\textBox($message, function ($line) {
                     return '<error>' . $line . '</error>';
                 }, 3);
 
