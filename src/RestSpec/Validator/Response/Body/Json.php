@@ -50,10 +50,6 @@ class Json extends Validator
         if ($responseSpec->getBody()) {
             $this->validateBody($response, $responseSpec);
         } elseif ($constraint = $responseSpec->getBodyConstraint()) {
-            $actualBody = (string) $response->getBody();
-
-            $actualBodyData = json_decode($actualBody, true);
-
             $validator = Validation::createValidator();
 
             try {
