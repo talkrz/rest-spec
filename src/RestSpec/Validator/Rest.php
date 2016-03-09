@@ -5,14 +5,11 @@ namespace RestSpec\Validator;
 use RestSpec\Output\Formatter;
 use RestSpec\Spec;
 use RestSpec\Console\SpecView\UseCaseView;
+use RestSpec\ValidationReport\ValidationReport;
 
 class Rest
 {
     use HasConsoleOutput;
-
-    private $useCasesPassedCount = 0;
-
-    private $useCasesFailedCount = 0;
 
     /**
      * @todo A monster method to refactor!!!
@@ -23,9 +20,12 @@ class Rest
      */
     public function validate(Spec\Rest $restSpec, $apiFilter, $useCaseFilter = null)
     {
+        $output = $this->getOutput()->getOutput();
+        $validationReport = new ValidationReport($this->getOutput());
+
         $apiSpecs = $restSpec->getApiSpecs();
 
-        $output = $this->getOutput()->getOutput();
+
 
         foreach ($apiSpecs as $apiSpec) {
             if ($apiFilter && $apiSpec->getName() !== $apiFilter) {
@@ -65,9 +65,9 @@ class Rest
                     $responseValidator->validate($res, $expectedResponseSpec);
 
                     if ($responseValidator->isValid()) {
-                        ++$this->useCasesPassedCount;
+                        $validationReport->incrementPassedCount();
                     } else {
-                        ++$this->useCasesFailedCount;
+                        $validationReport->incrementFailedCount();
                     }
 
                     $responseValidator->reset();
@@ -79,26 +79,12 @@ class Rest
             }
         }
 
-        $totalUseCases = $this->useCasesPassedCount + $this->useCasesFailedCount;
+        $validationReport->dumpAsConsoleText($apiFilter, $useCaseFilter);
 
-        if ($totalUseCases) {
-            $output->write(sprintf(
-                'Tested %d use cases. (<info>Passed: %d</info>',
-                $totalUseCases,
-                $this->useCasesPassedCount
-            ));
-            if ($this->useCasesFailedCount > 0) {
-                $output->writeln(sprintf(', <error>Failed: %d</error>)', $this->useCasesFailedCount));
-                exit(1);
-            } else {
-                $output->writeln(')');
-                exit(0);
-            }
-        } else {
-            $output->writeln('No use cases matching your criteria:');
-            $output->writeln(sprintf('  - api filter: %s', $apiFilter ? $apiFilter : '[none]'));
-            $output->writeln(sprintf('  - use case filter: %s', $useCaseFilter ? $useCaseFilter : '[none]'));
+        if ($validationReport->getTotalUseCases() === 0 || $validationReport->getUseCasesFailedCount() > 0) {
             exit(1);
+        } else {
+            exit(0);
         }
     }
 }

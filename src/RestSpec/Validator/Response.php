@@ -4,7 +4,6 @@ namespace RestSpec\Validator;
 
 use RestSpec\Spec;
 
-
 class Response extends Validator
 {
     use HasConsoleOutput;
@@ -23,12 +22,12 @@ class Response extends Validator
         $this->validateStatusCode($response, $responseSpec);
 
         if ($requiredHeaders = $responseSpec->getRequiredHeaders()) {
-            foreach($requiredHeaders as $headerName => $headerValue) {
+            foreach ($requiredHeaders as $headerName => $headerValue) {
                 $actualHeader = $response->getHeader($headerName);
 
                 if (!$actualHeader) {
                     $output->writeln(sprintf("\t\t<error>Response does not contain required header %s</error>", $headerName));
-                } else if ($actualHeader !== $headerValue) {
+                } elseif ($actualHeader !== $headerValue) {
                     $message = sprintf("\t\t<error>The actual value of %s header is %s, but should be %s</error>",
                         $headerName,
                         $actualHeader,
@@ -41,7 +40,7 @@ class Response extends Validator
 
             if ($this->isValid()) {
                 $output->writeln(sprintf("\t\tResponse has following required headers:"));
-                foreach($requiredHeaders as $headerName => $headerValue) {
+                foreach ($requiredHeaders as $headerName => $headerValue) {
                     $output->writeln(sprintf("\t\t\t<info>%s: %s</info>", $headerName, $headerValue));
                 }
             }
@@ -51,6 +50,26 @@ class Response extends Validator
             $bodyValidator = new Response\Body($this->getOutput());
             $bodyValidator->validate($response, $responseSpec);
             $this->addViolations($bodyValidator->getViolations());
+
+            $output->writeln('');
+            if ($this->isValid()) {
+                $output->writeln("\t\tResponse body is valid JSON:\n\n");
+                $actualBody = (string) $response->getBody();
+
+                $json = json_decode($actualBody);
+
+                if ($json) {
+                    $bodyStr = json_encode($json, JSON_PRETTY_PRINT);
+                } else {
+                    $bodyStr = $json;
+                }
+
+                $output->writeln(sprintf("<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 2)));
+            } else {
+                foreach ($this->getViolations() as $violation) {
+                    $output->writeln($violation);
+                }
+            }
         }
 
         return $this->isValid();

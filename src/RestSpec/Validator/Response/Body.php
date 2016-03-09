@@ -16,9 +16,9 @@ class Body extends Validator
     {
         $output = $this->getOutput()->getOutput();
 
-        switch($responseSpec->getBodyType()) {
+        switch ($responseSpec->getBodyType()) {
             case Spec\Response::BODY_TYPE_JSON:
-                $jsonValidator = new Json($this->getOutput());
+                $jsonValidator = new Json();
 
                 $jsonValidator->validate($response, $responseSpec);
 
