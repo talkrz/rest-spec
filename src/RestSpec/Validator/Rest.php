@@ -2,10 +2,11 @@
 
 namespace RestSpec\Validator;
 
-use RestSpec\Output\Formatter;
 use RestSpec\Spec;
-use RestSpec\Console\SpecView\UseCaseView;
 use RestSpec\ValidationReport\ValidationReport;
+use RestSpec\ValidationReport\ApiValidationReport;
+use RestSpec\ValidationReport\UrlValidationReport;
+use RestSpec\ValidationReport\UseCaseValidationReport;
 
 class Rest
 {
@@ -31,16 +32,18 @@ class Rest
             if ($apiFilter && $apiSpec->getName() !== $apiFilter) {
                 continue;
             }
+
+            $apiValidationReport = new ApiValidationReport($apiSpec, $this->getOutput());
+            $validationReport->addApiReport($apiValidationReport);
             $client = new \GuzzleHttp\Client([
                 'base_url' => $apiSpec->getBaseUrl(),
             ]);
 
-            $output->writeln(sprintf("\nAPI base URL: <info>%s</info>\n", $apiSpec->getBaseUrl()));
-
-            $responseValidator = new Response($this->getOutput());
+            $responseValidator = new Response();
 
             foreach ($apiSpec->getUrlSpecs() as $urlSpec) {
-                $output->writeln(sprintf("<comment>%s</comment>\n\n<info>%s</info>\n", $urlSpec->getDescription(), $urlSpec->getUrl()));
+                $urlReport = new UrlValidationReport($urlSpec, $this->getOutput());
+                $apiValidationReport->addUrlReport($urlReport);
 
                 $useCases = $urlSpec->getUseCases();
 
@@ -49,20 +52,24 @@ class Rest
                         continue;
                     }
 
+                    $useCaseValidationReport = new UseCaseValidationReport($urlUseCaseSpec, $urlUseCaseSpec->getExpectedResponseSpec(), $this->getOutput());
+                    $urlReport->addUseCaseReport($useCaseValidationReport);
+
                     if ($beforeCallback = $urlUseCaseSpec->getBeforeCallback()) {
                         call_user_func($beforeCallback, $urlUseCaseSpec);
                     }
 
                     $request = $urlUseCaseSpec->getRequest();
 
-                    $useCaseView = new UseCaseView();
-                    $useCaseView->view($urlUseCaseSpec, $output);
+
 
                     $res = $client->send($request);
 
                     $expectedResponseSpec = $urlUseCaseSpec->getExpectedResponseSpec();
 
-                    $responseValidator->validate($res, $expectedResponseSpec);
+                    $responseValidator->validate($res, $expectedResponseSpec, $useCaseValidationReport);
+
+                    $useCaseValidationReport->setResponse($res);
 
                     if ($responseValidator->isValid()) {
                         $validationReport->incrementPassedCount();

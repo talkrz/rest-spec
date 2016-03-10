@@ -7,24 +7,24 @@ use Prophecy\Argument;
 
 class RequestSpec extends ObjectBehavior
 {
-    function let(\RestSpec\Spec\Request $request)
+    public function let(\RestSpec\Spec\Request $request)
     {
         $this->beConstructedWith('/foo');
     }
 
-    function it_is_initializable_with_an_url()
+    public function it_is_initializable_with_an_url()
     {
         $this->shouldHaveType('RestSpec\Spec\Request');
         $this->getUrl()->shouldBe('/foo');
     }
 
-    function it_allows_to_set_request_method()
+    public function it_allows_to_set_request_method()
     {
         $this->method('POST')->shouldReturn($this);
         $this->getMethod()->shouldReturn('POST');
     }
 
-    function it_allows_to_set_query_params()
+    public function it_allows_to_set_query_params()
     {
         $queryParams = [
             'foo' => 'bar',
@@ -34,7 +34,7 @@ class RequestSpec extends ObjectBehavior
         $this->getQuery()->shouldReturn($queryParams);
     }
 
-    function it_allows_to_set_list_of_headers()
+    public function it_allows_to_set_list_of_headers()
     {
         $headers = [
             'X-LOL-HEADER' => 'xD',
@@ -44,7 +44,7 @@ class RequestSpec extends ObjectBehavior
         $this->getHeaders()->shouldReturn($headers);
     }
 
-    function it_allows_to_specify_body()
+    public function it_allows_to_specify_body()
     {
         $body = 'a body';
 
@@ -52,7 +52,7 @@ class RequestSpec extends ObjectBehavior
         $this->getBody()->shouldReturn($body);
     }
 
-    function it_does_not_allow_to_set_array_body()
+    public function it_does_not_allow_to_set_array_body()
     {
         $wrongBody = ['wrong body'];
         $this->shouldThrow('\InvalidArgumentException')->duringBody($wrongBody);

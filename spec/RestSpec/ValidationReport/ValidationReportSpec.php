@@ -7,6 +7,11 @@ use Prophecy\Argument;
 
 class ValidationReportSpec extends ObjectBehavior
 {
+    public function let(\RestSpec\Output\ConsoleOutput $consoleOutput)
+    {
+        $this->beConstructedWith($consoleOutput);
+    }
+
     public function it_is_initializable()
     {
         $this->shouldHaveType('RestSpec\ValidationReport\ValidationReport');

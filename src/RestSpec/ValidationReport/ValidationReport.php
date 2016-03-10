@@ -12,6 +12,18 @@ class ValidationReport
 
     private $useCasesFailedCount = 0;
 
+    private $apiReports = [];
+
+    public function addApiReport(ApiValidationReport $report)
+    {
+        $this->apiReports[] = $report;
+    }
+
+    public function getApiReports()
+    {
+        return $this->apiReports;
+    }
+
     public function getUseCasesPassedCount()
     {
         return $this->useCasesPassedCount;
@@ -40,6 +52,10 @@ class ValidationReport
     public function dumpAsConsoleText($apiFilter, $useCaseFilter)
     {
         $output = $this->getOutput()->getOutput();
+
+        foreach ($this->getApiReports() as $apiReport) {
+            $apiReport->dumpAsConsoleText();
+        }
 
         $totalUseCases = $this->getTotalUseCases();
 
