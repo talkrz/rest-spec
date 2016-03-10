@@ -2,15 +2,11 @@
 
 namespace RestSpec\ValidationReport;
 
-use RestSpec\Validator\HasConsoleOutput;
 use RestSpec\Spec;
-use RestSpec\Output\ConsoleOutput;
 use RestSpec\Console\SpecView\UseCaseView;
 
 class UseCaseValidationReport
 {
-    use HasConsoleOutput;
-
     /**
      * @var Spec\UseCase
      */
@@ -32,11 +28,10 @@ class UseCaseValidationReport
      */
     private $response;
 
-    public function __construct(Spec\UseCase $spec, Spec\Response $responseSpec, ConsoleOutput $output)
+    public function __construct(Spec\UseCase $spec, Spec\Response $responseSpec)
     {
         $this->spec = $spec;
         $this->responseSpec = $responseSpec;
-        $this->output = $output;
     }
 
     public function addBodyViolation($bodyViolation)
@@ -94,29 +89,29 @@ class UseCaseValidationReport
 
     public function dumpAsConsoleText()
     {
-        $output = $this->getOutput()->getOutput();
+        $output = '';
 
         $useCaseView = new UseCaseView();
-        $output->write($useCaseView->view($this->spec));
+        $output .= $useCaseView->view($this->spec);
 
         if ($this->getStatusCodeViolation()) {
-            $output->writeln($this->getStatusCodeViolation());
+            $output .= $this->getStatusCodeViolation() . "\n";
         } else {
-            $output->writeln(sprintf("\t\tResponse code is <info>%s</info>", $this->getResponse()->getStatusCode()));
+            $output .= sprintf("\t\tResponse code is <info>%s</info>\n", $this->getResponse()->getStatusCode());
         }
 
         if ($this->getHeadersViolations()) {
             foreach ($this->getHeadersViolations() as $violation) {
-                $output->writeln($violation);
+                $output .= $violation . "\n";
             }
         } else {
-            $output->writeln(sprintf("\t\tResponse has following required headers:"));
+            $output .= sprintf("\t\tResponse has following required headers:\n");
             foreach ($this->responseSpec->getRequiredHeaders() as $headerName => $headerValue) {
-                $output->writeln(sprintf("\t\t\t<info>%s: %s</info>", $headerName, $headerValue));
+                $output .= sprintf("\t\t\t<info>%s: %s</info>\n", $headerName, $headerValue);
             }
         }
 
-        $output->writeln('');
+        $output .= "\n";
 
         if (!$this->getBodyViolations()) {
             $actualBody = (string) $this->getResponse()->getBody();
@@ -129,13 +124,15 @@ class UseCaseValidationReport
                 $bodyStr = $json;
             }
 
-            $output->writeln("\t\tResponse body is valid:\n\n");
+            $output .= "\t\tResponse body is valid:\n\n\n";
 
-            $output->writeln(sprintf("<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 2)));
+            $output .= sprintf("<info>%s</info>\n\n\n", \RestSpec\Output\indentValue($bodyStr, 2));
         } else {
             foreach ($this->getBodyViolations() as $violation) {
-                $output->writeln($violation);
+                $output .= $violation . "\n";
             }
         }
+
+        return $output;
     }
 }

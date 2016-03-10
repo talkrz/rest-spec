@@ -2,38 +2,58 @@
 
 namespace RestSpec\ValidationReport;
 
-use RestSpec\Validator\HasConsoleOutput;
-
 class ValidationReport
 {
-    use HasConsoleOutput;
-
+    /**
+     * @var integer
+     */
     private $useCasesPassedCount = 0;
 
+    /**
+     * @var integer
+     */
     private $useCasesFailedCount = 0;
 
+    /**
+     * @var ApiValidationReport[]
+     */
     private $apiReports = [];
 
+    /**
+     * @param ApiValidationReport $report
+     */
     public function addApiReport(ApiValidationReport $report)
     {
         $this->apiReports[] = $report;
     }
 
+    /**
+     * @return ApiValidationReport[]
+     */
     public function getApiReports()
     {
         return $this->apiReports;
     }
 
+    /**
+     * @return integer
+     */
     public function getUseCasesPassedCount()
     {
         return $this->useCasesPassedCount;
     }
 
+    /**
+     * @return integer
+     */
     public function getUseCasesFailedCount()
     {
         return $this->useCasesFailedCount;
     }
 
+    /**
+     * @return integer
+     */
     public function getTotalUseCases()
     {
         return $this->getUseCasesPassedCount() + $this->getUseCasesFailedCount();
@@ -51,29 +71,31 @@ class ValidationReport
 
     public function dumpAsConsoleText($apiFilter, $useCaseFilter)
     {
-        $output = $this->getOutput()->getOutput();
+        $output = '';
 
         foreach ($this->getApiReports() as $apiReport) {
-            $apiReport->dumpAsConsoleText();
+            $output .= $apiReport->dumpAsConsoleText();
         }
 
         $totalUseCases = $this->getTotalUseCases();
 
         if ($totalUseCases) {
-            $output->write(sprintf(
+            $output .= sprintf(
                 'Tested %d use cases. (<info>Passed: %d</info>',
                 $totalUseCases,
                 $this->getUseCasesPassedCount()
-            ));
+            );
             if ($this->getUseCasesFailedCount() > 0) {
-                $output->writeln(sprintf(', <error>Failed: %d</error>)', $this->getUseCasesFailedCount()));
+                $output .= sprintf(", <error>Failed: %d</error>)\n", $this->getUseCasesFailedCount());
             } else {
-                $output->writeln(')');
+                $output .= ")\n";
             }
         } else {
-            $output->writeln('No use cases matching your criteria:');
-            $output->writeln(sprintf('  - api filter: %s', $apiFilter ? $apiFilter : '[none]'));
-            $output->writeln(sprintf('  - use case filter: %s', $useCaseFilter ? $useCaseFilter : '[none]'));
+            $output .= "No use cases matching your criteria:\n";
+            $output .= sprintf("  - api filter: %s\n", $apiFilter ? $apiFilter : '[none]');
+            $output .= sprintf("  - use case filter: %s\n", $useCaseFilter ? $useCaseFilter : '[none]');
         }
+
+        return $output;
     }
 }

@@ -10,30 +10,25 @@ use RestSpec\ValidationReport\UseCaseValidationReport;
 
 class Rest
 {
-    use HasConsoleOutput;
-
     /**
      * @todo A monster method to refactor!!!
      *
      * @param  SpecRest $restSpec
      * @param  string   $useCaseFilter
-     * @return void
+     * @return ValidationReport
      */
     public function validate(Spec\Rest $restSpec, $apiFilter, $useCaseFilter = null)
     {
-        $output = $this->getOutput()->getOutput();
-        $validationReport = new ValidationReport($this->getOutput());
+        $validationReport = new ValidationReport();
 
         $apiSpecs = $restSpec->getApiSpecs();
-
-
 
         foreach ($apiSpecs as $apiSpec) {
             if ($apiFilter && $apiSpec->getName() !== $apiFilter) {
                 continue;
             }
 
-            $apiValidationReport = new ApiValidationReport($apiSpec, $this->getOutput());
+            $apiValidationReport = new ApiValidationReport($apiSpec);
             $validationReport->addApiReport($apiValidationReport);
             $client = new \GuzzleHttp\Client([
                 'base_url' => $apiSpec->getBaseUrl(),
@@ -42,7 +37,7 @@ class Rest
             $responseValidator = new Response();
 
             foreach ($apiSpec->getUrlSpecs() as $urlSpec) {
-                $urlReport = new UrlValidationReport($urlSpec, $this->getOutput());
+                $urlReport = new UrlValidationReport($urlSpec);
                 $apiValidationReport->addUrlReport($urlReport);
 
                 $useCases = $urlSpec->getUseCases();
@@ -52,7 +47,11 @@ class Rest
                         continue;
                     }
 
-                    $useCaseValidationReport = new UseCaseValidationReport($urlUseCaseSpec, $urlUseCaseSpec->getExpectedResponseSpec(), $this->getOutput());
+                    $useCaseValidationReport = new UseCaseValidationReport(
+                        $urlUseCaseSpec,
+                        $urlUseCaseSpec->getExpectedResponseSpec()
+                    );
+
                     $urlReport->addUseCaseReport($useCaseValidationReport);
 
                     if ($beforeCallback = $urlUseCaseSpec->getBeforeCallback()) {
@@ -60,14 +59,13 @@ class Rest
                     }
 
                     $request = $urlUseCaseSpec->getRequest();
-
-
-
                     $res = $client->send($request);
 
-                    $expectedResponseSpec = $urlUseCaseSpec->getExpectedResponseSpec();
-
-                    $responseValidator->validate($res, $expectedResponseSpec, $useCaseValidationReport);
+                    $responseValidator->validate(
+                        $res,
+                        $urlUseCaseSpec->getExpectedResponseSpec(),
+                        $useCaseValidationReport
+                    );
 
                     $useCaseValidationReport->setResponse($res);
 
@@ -86,12 +84,6 @@ class Rest
             }
         }
 
-        $validationReport->dumpAsConsoleText($apiFilter, $useCaseFilter);
-
-        if ($validationReport->getTotalUseCases() === 0 || $validationReport->getUseCasesFailedCount() > 0) {
-            exit(1);
-        } else {
-            exit(0);
-        }
+        return $validationReport;
     }
 }

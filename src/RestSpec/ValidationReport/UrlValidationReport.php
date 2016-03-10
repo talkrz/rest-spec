@@ -2,49 +2,59 @@
 
 namespace RestSpec\ValidationReport;
 
-use RestSpec\Validator\HasConsoleOutput;
 use RestSpec\Spec;
-use RestSpec\Output\ConsoleOutput;
 
 class UrlValidationReport
 {
-    use HasConsoleOutput;
-
     /**
      * @var Spec\Url
      */
     private $spec;
 
+    /**
+     * @var UseCaseValidationReport[]
+     */
     private $useCaseReports = [];
 
-
-    public function __construct(Spec\Url $spec, ConsoleOutput $output)
+    /**
+     * @param Spec\Url $spec [description]
+     */
+    public function __construct(Spec\Url $spec)
     {
         $this->spec = $spec;
-        $this->output = $output;
     }
 
+    /**
+     * @param UseCaseValidationReport $report
+     */
     public function addUseCaseReport(UseCaseValidationReport $report)
     {
         $this->useCaseReports[] = $report;
     }
 
+    /**
+     * @return UseCaseValidationReport
+     */
     public function getUseCaseReports()
     {
         return $this->useCaseReports;
     }
 
+    /**
+     * @return string
+     */
     public function dumpAsConsoleText()
     {
-        $output = $this->getOutput()->getOutput();
-        $output->writeln(sprintf(
-            "<comment>%s</comment>\n\n<info>%s</info>\n",
+        $output = sprintf(
+            "<comment>%s</comment>\n\n<info>%s</info>\n\n",
             $this->spec->getDescription(),
             $this->spec->getUrl()
-        ));
+        );
 
         foreach ($this->getUseCaseReports() as $report) {
-            $report->dumpAsConsoleText();
+            $output .= $report->dumpAsConsoleText();
         }
+
+        return $output;
     }
 }

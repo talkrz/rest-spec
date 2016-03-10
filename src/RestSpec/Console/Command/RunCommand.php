@@ -34,7 +34,7 @@ class RunCommand extends Command
         $constraintDescriber = new \RestSpec\Output\ConstraintDescriber();
 
         $consoleOutput = new \RestSpec\Output\ConsoleOutput($output, $constraintDescriber);
-        $validator = new \RestSpec\Validator\Rest($consoleOutput);
+        $validator = new \RestSpec\Validator\Rest();
         $loader = new \RestSpec\Loader();
         $loader->run();
 
@@ -44,7 +44,15 @@ class RunCommand extends Command
             $restSpec = Spec\Rest::getInstance();
             $restSpecValidator = new \RestSpec\Spec\Validator();
             $restSpecValidator->validate($restSpec);
-            $validator->validate($restSpec, $api, $useCaseFilter);
+            $report = $validator->validate($restSpec, $api, $useCaseFilter);
+
+            $output->write($report->dumpAsConsoleText($api, $useCaseFilter));
+
+            if ($report->getTotalUseCases() === 0 || $report->getUseCasesFailedCount() > 0) {
+                exit(1);
+            } else {
+                exit(0);
+            }
         } catch (\Exception $e) {
             $consoleOutput->getOutput()->writeln(sprintf(
                 '<error>Whoops! Some unexpected error occured. The exception type is: %s, and a message is following:</error>',
