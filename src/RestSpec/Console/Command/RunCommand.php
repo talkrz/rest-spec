@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use RestSpec\Spec;
 
 class RunCommand extends Command
@@ -44,7 +45,17 @@ class RunCommand extends Command
             $restSpec = Spec\Rest::getInstance();
             $restSpecValidator = new \RestSpec\Spec\Validator();
             $restSpecValidator->validate($restSpec);
+
+            $progressBar = new ProgressBar($output);
+            $progressBar->setFormat('Testing your API specs. Already tested: %current% use cases [%bar%]');
+            $progressBar->start();
+            $validator->progress(function ($useCases) use ($output, $progressBar) {
+                $progressBar->advance();
+            });
+
             $report = $validator->validate($restSpec, $api, $useCaseFilter);
+
+            $progressBar->finish();
 
             $output->write($report->dumpAsConsoleText($api, $useCaseFilter));
 

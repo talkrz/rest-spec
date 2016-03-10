@@ -11,6 +11,20 @@ use RestSpec\ValidationReport\UseCaseValidationReport;
 class Rest
 {
     /**
+     * @var callable
+     */
+    private $onProgress;
+
+    /**
+     * @param  callable $onProgress
+     * @return
+     */
+    public function progress(callable $onProgress)
+    {
+        $this->onProgress = $onProgress;
+    }
+
+    /**
      * @todo A monster method to refactor!!!
      *
      * @param  SpecRest $restSpec
@@ -79,6 +93,10 @@ class Rest
 
                     if ($doneCallback = $urlUseCaseSpec->getDoneCallback()) {
                         call_user_func($doneCallback, $res);
+                    }
+
+                    if ($this->onProgress) {
+                        call_user_func($this->onProgress, $validationReport->getTotalUseCases());
                     }
                 }
             }
