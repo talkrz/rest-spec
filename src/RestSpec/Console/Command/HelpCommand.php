@@ -19,7 +19,7 @@ class HelpCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln("Usage:");
-        $output->writeln("<info>\trest-spec glimpse</info> view brief information about the API");
-        $output->writeln("<info>\trest-spec run [use-case-filter]</info> run validation of the API");
+        $output->writeln("<info>\trest-spec preview</info> view brief information about the API");
+        $output->writeln("<info>\trest-spec run [use-case-filter] [--api api-name]</info> run validation of the API");
     }
 }
