@@ -2,8 +2,7 @@
 
 namespace RestSpec\Console\SpecView;
 
-use RestSpec\Spec,
-    Symfony\Component\Console\Output\OutputInterface;
+use RestSpec\Spec;
 
 class UseCaseView
 {
@@ -12,13 +11,13 @@ class UseCaseView
      *
      * @param  Spec\UseCase    $useCase an URL use case specification
      * @param  OutputInterface
-     * @return void
+     * @return string
      */
-    public function view(Spec\UseCase $useCase, OutputInterface $output)
+    public function view(Spec\UseCase $useCase)
     {
         $request = $useCase->getRequest();
 
-        $output->writeln(sprintf("\t<options=bold>%s</options=bold>\n", $useCase->getDescription()));
+        $output = sprintf("\t<options=bold>%s</options=bold>\n\n", $useCase->getDescription());
 
 
         if ($useCase->isATemplate()) {
@@ -31,15 +30,14 @@ class UseCaseView
             $url .= '?' . urldecode($queryParameters);
         }
 
-        $output->writeln(sprintf("\t<info>%s %s</info>\n", $request->getMethod(), $url));
+        $output .= sprintf("\t<info>%s %s</info>\n\n", $request->getMethod(), $url);
 
         if ($headers = $request->getHeaders()) {
-
-            foreach($headers as $headerName => $headerValue) {
-                $output->writeln(sprintf("\t%s: <info>%s</info>", $headerName, join('; ', $headerValue)));
+            foreach ($headers as $headerName => $headerValue) {
+                $output .= sprintf("\t%s: <info>%s</info>\n", $headerName, join('; ', $headerValue));
             }
 
-            $output->writeln('');
+            $output .= "\n";
         }
 
         if ($body = (string) $request->getBody()) {
@@ -51,9 +49,11 @@ class UseCaseView
                 $bodyStr = $json;
             }
 
-            $output->writeln(sprintf("<info>%s</info>\n\n", \RestSpec\Output\indentValue($bodyStr, 1)));
+            $output .= sprintf("<info>%s</info>\n\n\n", \RestSpec\Output\indentValue($bodyStr, 1));
         }
 
-        $output->write(PHP_EOL);
+        $output .= "\n";
+
+        return $output;
     }
 }

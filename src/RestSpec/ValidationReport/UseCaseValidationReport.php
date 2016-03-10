@@ -97,7 +97,7 @@ class UseCaseValidationReport
         $output = $this->getOutput()->getOutput();
 
         $useCaseView = new UseCaseView();
-        $useCaseView->view($this->spec, $output);
+        $output->write($useCaseView->view($this->spec));
 
         if ($this->getStatusCodeViolation()) {
             $output->writeln($this->getStatusCodeViolation());
