@@ -65,8 +65,11 @@ class RunCommand extends Command
                 exit(0);
             }
         } catch (\Exception $e) {
+            $log = join("\n", $validator->getLog());
+
             $consoleOutput->getOutput()->writeln(sprintf(
-                '<error>Whoops! Some unexpected error occured. The exception type is: %s, and a message is following:</error>',
+                "\n<error>Whoops! Some unexpected error occured. Validation log dump:\n\n%s\n\nThe exception type is: %s, and a message is following:</error>",
+                $log,
                 get_class($e)
             ));
 

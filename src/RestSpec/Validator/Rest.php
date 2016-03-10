@@ -16,12 +16,22 @@ class Rest
     private $onProgress;
 
     /**
+     * @var array
+     */
+    private $log = [];
+
+    /**
      * @param  callable $onProgress
      * @return
      */
     public function progress(callable $onProgress)
     {
         $this->onProgress = $onProgress;
+    }
+
+    public function getLog()
+    {
+        return $this->log;
     }
 
     /**
@@ -39,8 +49,11 @@ class Rest
 
         foreach ($apiSpecs as $apiSpec) {
             if ($apiFilter && $apiSpec->getName() !== $apiFilter) {
+                $this->log[] = sprintf("API %s omitted due to filter '%'", $apiSpec->getName(), $apiFilter);
                 continue;
             }
+
+            $this->log[] = sprintf("Testing %s API at %s ", $apiSpec->getName(), $apiSpec->getBaseUrl());
 
             $apiValidationReport = new ApiValidationReport($apiSpec);
             $validationReport->addApiReport($apiValidationReport);
@@ -51,6 +64,7 @@ class Rest
             $responseValidator = new Response();
 
             foreach ($apiSpec->getUrlSpecs() as $urlSpec) {
+                $this->log[] = sprintf("\tTesting URL %s", $urlSpec->getUrl());
                 $urlReport = new UrlValidationReport($urlSpec);
                 $apiValidationReport->addUrlReport($urlReport);
 
