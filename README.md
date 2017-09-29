@@ -72,7 +72,7 @@ That's it!
 
 As a result of this command you should see result of verifying previously defined specification against real API:
 
-![alt text](https://dl.dropboxusercontent.com/u/8147893/rest-spec.png "rest-spec example result")
+![alt text](https://raw.githubusercontent.com/talkrz/rest-spec/master/docs/rest-spec.png "rest-spec example result")
 
 ## Always up-to-date specification
 
@@ -101,7 +101,7 @@ api('https://api.github.com', function() {
 
 After running rest-spec we see, that actual response contains different header than in specification, so we know that we need to update it:
 
-![alt text](https://dl.dropboxusercontent.com/u/8147893/rest-spec-invalid.png "rest-spec example result")
+![alt text](https://raw.githubusercontent.com/talkrz/rest-spec/master/docs/rest-spec-invalid.png "rest-spec example result")
 
 
 The other purpose is testing of your application. As rest-spec perform calls to actual application, it can detect problems.
